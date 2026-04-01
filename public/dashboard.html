@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Brew Cafe</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="dashboard-page dark-theme">
+    <!-- Top Navigation Bar -->
+    <nav class="top-nav glass-panel">
+        <div class="nav-content">
+            <div class="cafe-brand">
+                <i class="fa-solid fa-mug-hot gradient-text"></i>
+                <span class="brand-name">Brew<span class="gradient-text">Cafe</span></span>
+            </div>
+            <div class="nav-actions">
+                <button class="icon-btn theme-toggle" id="themeToggle" title="Toggle Theme">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                <div class="notification-wrapper">
+                    <button class="icon-btn" title="Notifications">
+                        <i class="fa-solid fa-bell"></i>
+                        <span class="badge">3</span>
+                    </button>
+                </div>
+                <div class="profile-dropdown">
+                    <div class="avatar">
+                        <img src="https://ui-avatars.com/api/?name=Admin&background=random" alt="Admin">
+                    </div>
+                    <button class="btn-logout" id="logoutBtn">Logout <i
+                            class="fa-solid fa-arrow-right-from-bracket"></i></button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar glass-panel">
+            <ul class="nav-menu">
+                <li class="nav-item active">
+                    <a href="#" class="nav-link" data-target="dashboard">
+                        <i class="fa-solid fa-chart-pie nav-icon"></i>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-target="orders">
+                        <i class="fa-solid fa-receipt nav-icon"></i>
+                        <span class="nav-text">Orders</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-target="menu">
+                        <i class="fa-solid fa-utensils nav-icon"></i>
+                        <span class="nav-text">Menu</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-target="inventory">
+                        <i class="fa-solid fa-boxes-stacked nav-icon"></i>
+                        <span class="nav-text">Inventory</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" id="exportBtn">
+                        <i class="fa-solid fa-file-csv nav-icon"></i>
+                        <span class="nav-text">Export CSV</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+
+            <!-- Dashboard View -->
+            <section id="view-dashboard" class="view-section active">
+                <div class="welcome-section fade-in">
+                    <h1>Welcome back, <span class="gradient-text">Admin</span></h1>
+                    <p class="welcome-subtitle">Here's your real-time intelligent overview for today.</p>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="stats-grid fade-in stagger-1">
+                    <div class="stat-card glass-panel">
+                        <div class="stat-icon-wrapper pulse-bg">
+                            <i class="fa-solid fa-box stat-icon"></i>
+                        </div>
+                        <div class="stat-info">
+                            <p class="stat-label">Total Orders Today</p>
+                            <h3 class="stat-value counter" id="stat-total-orders">--</h3>
+                        </div>
+                    </div>
+
+                    <div class="stat-card glass-panel">
+                        <div class="stat-icon-wrapper warning-bg">
+                            <i class="fa-solid fa-fire stat-icon"></i>
+                        </div>
+                        <div class="stat-info">
+                            <p class="stat-label">Active Orders</p>
+                            <h3 class="stat-value counter" id="stat-active-orders">--</h3>
+                        </div>
+                    </div>
+
+                    <div class="stat-card glass-panel">
+                        <div class="stat-icon-wrapper success-bg">
+                            <i class="fa-solid fa-sack-dollar stat-icon"></i>
+                        </div>
+                        <div class="stat-info">
+                            <p class="stat-label">Revenue Today</p>
+                            <h3 class="stat-value counter" id="stat-revenue">₹--</h3>
+                        </div>
+                    </div>
+
+                    <div class="stat-card glass-panel">
+                        <div class="stat-icon-wrapper info-bg">
+                            <i class="fa-solid fa-chair stat-icon"></i>
+                        </div>
+                        <div class="stat-info">
+                            <p class="stat-label">Reservations</p>
+                            <h3 class="stat-value counter" id="stat-reservations">--</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Insights & Charts Row -->
+                <div class="dashboard-row fade-in stagger-2">
+                    <!-- AI Insights Panel -->
+                    <div class="ai-panel glass-panel">
+                        <h2 class="section-title"><i class="fa-solid fa-wand-magic-sparkles ai-icon"></i> AI Insights
+                        </h2>
+                        <div class="insight-list">
+                            <div class="insight-item">
+                                <div class="insight-icon"><i class="fa-solid fa-chart-line"></i></div>
+                                <div class="insight-text">
+                                    <h4>Tomorrow's Prediction</h4>
+                                    <p>Expecting <strong id="ai-prediction" class="gradient-text">--</strong> orders
+                                        based
+                                        on 7-day trailing average.</p>
+                                </div>
+                            </div>
+                            <div class="insight-item">
+                                <div class="insight-icon"><i class="fa-regular fa-clock"></i></div>
+                                <div class="insight-text">
+                                    <h4>Peak Hour Detected</h4>
+                                    <p>Busiest ordering time is around <strong id="ai-peak">--</strong>.</p>
+                                </div>
+                            </div>
+                            <div class="insight-item">
+                                <div class="insight-icon"><i class="fa-solid fa-arrow-trend-up"></i></div>
+                                <div class="insight-text">
+                                    <h4>Revenue Growth</h4>
+                                    <p>Up <strong id="ai-growth">--%</strong> compared to yesterday.</p>
+                                </div>
+                            </div>
+                            <div class="insight-item">
+                                <div class="insight-icon"><i class="fa-solid fa-star"></i></div>
+                                <div class="insight-text">
+                                    <h4>Customer Satisfaction</h4>
+                                    <p>Average rating is <strong id="ai-rating">--</strong> / 5.0.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Chart -->
+                    <div class="chart-panel glass-panel">
+                        <h2 class="section-title">Revenue (Last 7 Days)</h2>
+                        <div class="chart-container">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Secondary Charts Row -->
+                <div class="dashboard-row fade-in stagger-3">
+                    <div class="chart-panel glass-panel">
+                        <h2 class="section-title">Order Volume (Last 7 Days)</h2>
+                        <div class="chart-container">
+                            <canvas id="ordersChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-panel glass-panel">
+                        <h2 class="section-title">Order Status Distribution</h2>
+                        <div class="chart-container" style="max-width: 300px; margin: 0 auto;">
+                            <canvas id="statusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section> <!-- End Dashboard View -->
+
+            <!-- Orders View -->
+            <section id="view-orders" class="view-section" style="display: none;">
+                <div class="welcome-section fade-in">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h1>Order <span class="gradient-text">Management</span></h1>
+                        <button class="btn-primary" onclick="showCreateOrderForm()"><i class="fa-solid fa-plus"></i> New
+                            Order</button>
+                    </div>
+                </div>
+
+                <div class="glass-panel fade-in stagger-1" style="padding: 24px;">
+                    <div class="toolbar">
+                        <div class="search-box">
+                            <i class="fa-solid fa-search"></i>
+                            <input type="text" id="orderSearch" placeholder="Search orders...">
+                        </div>
+                        <select id="statusFilter" class="modern-select">
+                            <option value="">All Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="modern-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Customer</th>
+                                    <th>Items</th>
+                                    <th>Total (₹)</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th style="min-width: 120px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ordersTableBody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pagination">
+                        <button id="prevPage" class="btn-secondary" disabled>Prev</button>
+                        <span id="pageIndicator">Page 1</span>
+                        <button id="nextPage" class="btn-secondary">Next</button>
+                    </div>
+                </div>
+            </section> <!-- End Orders View -->
+
+            <!-- Menu View -->
+            <section id="view-menu" class="view-section" style="display: none;">
+                <div class="welcome-section fade-in">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h1>Menu <span class="gradient-text">Items</span></h1>
+                        <button class="btn-primary" onclick="showCreateMenuForm()"><i class="fa-solid fa-plus"></i> Add
+                            Item</button>
+                    </div>
+                </div>
+
+                <div class="glass-panel fade-in stagger-1" style="padding: 24px;">
+                    <div class="table-container">
+                        <table class="modern-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Category</th>
+                                    <th>Price (₹)</th>
+                                    <th>Available</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="menuTableBody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section> <!-- End Menu View -->
+
+            <!-- Inventory View -->
+            <section id="view-inventory" class="view-section" style="display: none;">
+                <div class="welcome-section fade-in">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h1>Inventory <span class="gradient-text">Tracker</span></h1>
+                        <button class="btn-primary" onclick="showCreateInventoryForm()"><i class="fa-solid fa-plus"></i>
+                            Add Inventory</button>
+                    </div>
+                </div>
+
+                <div class="glass-panel fade-in stagger-1" style="padding: 24px;">
+                    <div class="table-container">
+                        <table class="modern-table">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Quantity</th>
+                                    <th>Unit</th>
+                                    <th>Low Stock Alert</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventoryTableBody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section> <!-- End Inventory View -->
+        </main>
+    </div>
+
+    <!-- Modals are now strictly for forms, not giant tables -->
+    <!-- Create/Edit Order Form Modal -->
+    <div id="orderFormModal" class="modal-overlay">
+        <div class="modal-content small-modal glass-panel">
+            <div class="modal-header">
+                <h2 id="orderFormTitle">Create Order</h2>
+                <button class="icon-btn close-modal" onclick="closeOrderFormModal()"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="orderForm">
+                <input type="hidden" id="orderId">
+                <div class="form-group" style="position: relative;">
+                    <label>Search Menu to Add Items</label>
+                    <input type="text" id="orderItemSearchInput" class="modern-input"
+                        placeholder="Type to find items..." autocomplete="off">
+                    <div id="orderItemDropdown" class="glass-panel"
+                        style="display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 1000; max-height: 200px; overflow-y: auto; margin-top: 5px; padding: 5px;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Selected Items</label>
+                    <div id="selectedOrderItems" class="selected-items-container"
+                        style="min-height: 60px; border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; display: flex; flex-wrap: wrap; gap: 10px; background: rgba(255, 255, 255, 0.05);">
+                        <p id="noItemsText"
+                            style="color: var(--text-secondary); margin: 0; font-size: 0.9rem; width: 100%;">No items
+                            selected yet.</p>
+                    </div>
+                    <input type="hidden" id="orderItems" required>
+                </div>
+
+                <div class="form-group" style="display: flex; gap: 15px;">
+                    <div style="flex: 2;">
+                        <label>Total Price (₹)</label>
+                        <input type="number" step="0.01" id="orderPrice" required class="modern-input"
+                            placeholder="0.00" readonly
+                            style="opacity: 0.8; cursor: not-allowed; font-weight: bold; color: var(--gold-primary);">
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Discount (%)</label>
+                        <input type="number" step="1" id="orderDiscount" class="modern-input" placeholder="0" min="0"
+                            max="100" value="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Order Notes</label>
+                    <textarea id="orderNotes" class="modern-input" rows="2"
+                        placeholder="e.g. Extra hot, oat milk instead..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="orderStatus" class="modern-select">
+                        <option value="pending">Pending</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary full-width mt-4">Save Order</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Create/Edit Menu Form Modal -->
+    <div id="menuFormModal" class="modal-overlay">
+        <div class="modal-content small-modal glass-panel">
+            <div class="modal-header">
+                <h2 id="menuFormTitle">Add Menu Item</h2>
+                <button class="icon-btn close-modal" onclick="closeMenuFormModal()"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="menuForm">
+                <input type="hidden" id="menuId">
+                <div class="form-group">
+                    <label>Item Name</label>
+                    <input type="text" id="menuName" required class="modern-input" placeholder="e.g. Vanilla Latte">
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <input type="text" id="menuCategory" required class="modern-input" placeholder="e.g. Hot Drinks">
+                </div>
+                <div class="form-group">
+                    <label>Price (₹)</label>
+                    <input type="number" step="0.01" id="menuPrice" required class="modern-input" placeholder="4.50">
+                </div>
+                <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="menuAvailable" checked style="width: 20px; height: 20px;">
+                    <label style="margin: 0; padding-top:2px;">Currently Available?</label>
+                </div>
+                <button type="submit" class="btn-primary full-width mt-4">Save Item</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Create/Edit Inventory Form Modal -->
+    <div id="inventoryFormModal" class="modal-overlay">
+        <div class="modal-content small-modal glass-panel">
+            <div class="modal-header">
+                <h2 id="inventoryFormTitle">Add Inventory Item</h2>
+                <button class="icon-btn close-modal" onclick="closeInventoryFormModal()"><i
+                        class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="inventoryForm">
+                <input type="hidden" id="inventoryId">
+                <div class="form-group">
+                    <label>Ingredient/Item Name</label>
+                    <input type="text" id="invName" required class="modern-input" placeholder="e.g. Whole Milk">
+                </div>
+                <div class="form-group" style="display: flex; gap: 15px;">
+                    <div style="flex: 2;">
+                        <label>Quantity in Stock</label>
+                        <input type="number" step="0.01" id="invQuantity" required class="modern-input"
+                            placeholder="5.5">
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Unit</label>
+                        <input type="text" id="invUnit" required class="modern-input" placeholder="Gallons">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Low Stock Alert Threshold</label>
+                    <input type="number" step="0.01" id="invThreshold" required class="modern-input" placeholder="2.0">
+                </div>
+                <button type="submit" class="btn-primary full-width mt-4">Save Inventory</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hidden Print Receipt Template -->
+    <div id="printReceipt" style="display: none;">
+        <div class="receipt-header">
+            <h2>Brew Cafe</h2>
+            <p>123 Coffee Lane</p>
+            <p>Receipt #<span id="printOrderId"></span></p>
+            <p>Date: <span id="printOrderDate"></span></p>
+        </div>
+        <hr style="border-top: 1px dashed black;">
+        <div id="printOrderItemsList" class="receipt-items"></div>
+        <hr style="border-top: 1px dashed black;">
+        <div class="receipt-totals">
+            <p>Subtotal: ₹<span id="printOrderSubtotal"></span></p>
+            <p>Discount: <span id="printOrderDiscount"></span>%</p>
+            <h3>Total: ₹<span id="printOrderTotal"></span></h3>
+        </div>
+        <div id="printOrderNotesContainer" style="display:none; margin-top:20px;">
+            <strong>Notes:</strong> <span id="printOrderNotes"></span>
+        </div>
+        <div class="receipt-footer" style="text-align:center; margin-top:30px;">
+            <p>Thank you for your order!</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

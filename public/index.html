@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Brew Cafe</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="login-page dark-theme">
+    <!-- Login Container -->
+    <div class="login-container">
+        <!-- Login Card -->
+        <div class="login-card glass-panel fade-in">
+            <!-- Café Logo/Name -->
+            <div class="cafe-logo">
+                <div class="coffee-icon pulse-bg">
+                    <i class="fa-solid fa-mug-hot gradient-text"></i>
+                </div>
+                <h1>Brew<span class="gradient-text">Cafe</span></h1>
+                <p class="tagline">Admin Intelligence Portal</p>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="login-form">
+                <!-- Email Field -->
+                <div class="form-group">
+                    <label for="email"><i class="fa-solid fa-envelope"></i> Email Address</label>
+                    <input type="email" id="email" name="email" class="modern-input" placeholder="admin@cafe.com"
+                        required>
+                    <span class="error-message" id="emailError"></span>
+                </div>
+
+                <!-- Password Field -->
+                <div class="form-group">
+                    <label for="password"><i class="fa-solid fa-lock"></i> Password</label>
+                    <input type="password" id="password" name="password" class="modern-input" placeholder="••••••••"
+                        required>
+                    <span class="error-message" id="passwordError"></span>
+                </div>
+
+                <!-- Login Button -->
+                <button type="submit" class="btn-primary full-width mt-4">
+                    Authenticate <i class="fa-solid fa-arrow-right"></i>
+                </button>
+
+                <!-- Demo Credentials Info -->
+                <div class="demo-info">
+                    <p><strong><i class="fa-solid fa-key"></i> Demo Access:</strong></p>
+                    <p>admin@cafe.com / admin123</p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

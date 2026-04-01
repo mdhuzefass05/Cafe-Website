@@ -1,0 +1,68 @@
+Order ID,Items,Total Price,Status,Date
+67,1x Cold Brew,3.75,completed,2026-02-27 07:11:47
+66,1x Cold Brew,3.75,pending,2026-02-27 07:06:51
+65,4x Chocolate Croissant,10.8,completed,2026-02-27 03:17:28
+64,2x Vanilla Latte,9,completed,2026-02-27 02:30:52
+63,3x Croissant,100,completed,2026-02-27 02:21:16
+22,3x Croissant,100,completed,2026-02-27 01:47:46
+21,2x Latte,50,completed,2026-02-27 01:38:56
+48,Dummy Item 5,53264.87,cancelled,2026-02-26 07:27:08
+55,Dummy Item 12,47235.44,cancelled,2026-02-26 07:27:08
+26,Dummy Item 3,45537.26,cancelled,2026-02-26 07:25:28
+31,Dummy Item 8,89692.5,cancelled,2026-02-26 07:25:28
+32,Dummy Item 9,-172940.69,cancelled,2026-02-26 07:25:28
+33,Dummy Item 10,-80310.68,cancelled,2026-02-26 07:25:28
+5,Dummy Item 4,175968.17,cancelled,2026-02-26 07:06:29
+6,Dummy Item 5,50097.1,completed,2026-02-26 07:06:29
+7,Dummy Item 6,-114737.44,completed,2026-02-26 07:06:29
+11,Dummy Item 10,101434.07,completed,2026-02-26 07:06:29
+19,Dummy Item 18,10016.3,completed,2026-02-26 07:06:29
+20,Dummy Item 19,-5121.43,completed,2026-02-26 07:06:29
+23,Dummy Item 0,-166419.91,completed,2026-02-25 07:25:28
+25,Dummy Item 2,181736.51,completed,2026-02-25 07:25:28
+37,Dummy Item 14,166291.2,cancelled,2026-02-25 07:25:28
+8,Dummy Item 7,-153533.14,cancelled,2026-02-25 07:06:29
+10,Dummy Item 9,109134.24,cancelled,2026-02-25 07:06:29
+16,Dummy Item 15,-94453.96,cancelled,2026-02-25 07:06:29
+43,Dummy Item 0,71943.04,cancelled,2026-02-24 07:27:08
+45,Dummy Item 2,-39924.69,cancelled,2026-02-24 07:27:08
+49,Dummy Item 6,20033.9,cancelled,2026-02-24 07:27:08
+56,Dummy Item 13,-79186.53,cancelled,2026-02-24 07:27:08
+27,Dummy Item 4,64399.7,cancelled,2026-02-24 07:25:28
+35,Dummy Item 12,27267.01,cancelled,2026-02-24 07:25:28
+39,Dummy Item 16,-18204.74,cancelled,2026-02-24 07:25:28
+42,Dummy Item 19,-88949.46,cancelled,2026-02-24 07:25:28
+15,Dummy Item 14,-145464.02,cancelled,2026-02-24 07:06:29
+18,Dummy Item 17,-54276.67,cancelled,2026-02-24 07:06:29
+47,Dummy Item 4,72883.5,cancelled,2026-02-23 07:27:08
+24,Dummy Item 1,-103507.56,cancelled,2026-02-23 07:25:28
+28,Dummy Item 5,-87256.06,cancelled,2026-02-23 07:25:28
+36,Dummy Item 13,-151436.07,cancelled,2026-02-23 07:25:28
+9,Dummy Item 8,-140938.06,cancelled,2026-02-23 07:06:29
+12,Dummy Item 11,110613.58,cancelled,2026-02-23 07:06:29
+14,Dummy Item 13,-93457.35,cancelled,2026-02-23 07:06:29
+54,Dummy Item 11,-54432.19,cancelled,2026-02-22 07:27:08
+40,Dummy Item 17,18541.64,cancelled,2026-02-22 07:25:28
+2,Dummy Item 1,-115271.73,cancelled,2026-02-22 07:06:29
+4,Dummy Item 3,84882.35,cancelled,2026-02-22 07:06:29
+57,Dummy Item 14,33344.79,cancelled,2026-02-21 07:27:08
+59,Dummy Item 16,2197.99,cancelled,2026-02-21 07:27:08
+60,Dummy Item 17,-151198.32,cancelled,2026-02-21 07:27:08
+62,Dummy Item 19,-28558.25,cancelled,2026-02-21 07:27:08
+30,Dummy Item 7,-108472.39,cancelled,2026-02-21 07:25:28
+1,Dummy Item 0,117702.42,cancelled,2026-02-21 07:06:29
+13,Dummy Item 12,43654.24,cancelled,2026-02-21 07:06:29
+3,Dummy Item 2,6974.89,cancelled,
+17,Dummy Item 16,137161.58,cancelled,
+29,Dummy Item 6,-55406.24,cancelled,
+34,Dummy Item 11,-121170.75,cancelled,
+38,Dummy Item 15,113142.91,cancelled,
+41,Dummy Item 18,177542.5,cancelled,
+44,Dummy Item 1,177889.74,cancelled,
+46,Dummy Item 3,162399.14,cancelled,
+50,Dummy Item 7,62786.56,cancelled,
+51,Dummy Item 8,62210.13,cancelled,
+52,Dummy Item 9,-2826.61,cancelled,
+53,Dummy Item 10,78454.6,cancelled,
+58,Dummy Item 15,32903.09,cancelled,
+61,Dummy Item 18,-56468.7,cancelled,

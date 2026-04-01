@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BrewCafe - Order & Relax</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            padding-top: 80px;
+            scroll-behavior: smooth;
+        }
+
+        .customer-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 15, 20, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .hero {
+            text-align: center;
+            padding: 100px 20px 80px 20px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+        }
+
+        .hero p {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 30px auto;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            font-size: 2.2rem;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 25px;
+            margin-bottom: 80px;
+        }
+
+        .menu-card {
+            padding: 25px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.3s;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(212, 175, 55, 0.5);
+        }
+
+        .menu-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+            color: white;
+        }
+
+        .menu-card p.cat {
+            color: var(--gold-primary);
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .menu-card .price {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .form-section {
+            max-width: 600px;
+            margin: 0 auto 80px auto;
+            padding: 40px;
+        }
+
+        .floating-cart {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 999;
+        }
+
+        .cart-btn {
+            background: var(--gold-primary);
+            color: #000;
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.4);
+            border: none;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .cart-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(212, 175, 55, 0.6);
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border: 2px solid var(--bg-primary);
+        }
+
+        /* Cart Sidebar */
+        .cart-sidebar {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100vh;
+            background: var(--bg-secondary);
+            border-left: 1px solid rgba(255, 255, 255, 0.05);
+            z-index: 1001;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .cart-sidebar.open {
+            right: 0;
+        }
+
+        .cart-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .cart-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .cart-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            display: none;
+            backdrop-filter: blur(3px);
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-title {
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+
+        .cart-item-price {
+            color: var(--gold-primary);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .qty-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 5px 10px;
+        }
+
+        .qty-btn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .qty-btn:hover {
+            color: var(--gold-primary);
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--gold-primary);
+        }
+    </style>
+</head>
+
+<body class="dark-theme">
+    <header class="customer-header">
+        <div class="logo">
+            <i class="fa-solid fa-mug-hot"
+                style="color: var(--gold-primary); font-size: 1.5rem; margin-right: 10px;"></i>
+            <h2 class="gradient-text" style="display:inline; margin:0; font-size:1.5rem;">BrewCafe</h2>
+        </div>
+        <nav class="nav-links" style="display: flex; gap: 30px; align-items: center;">
+            <a href="#about"><i class="fa-solid fa-users"></i> About Us</a>
+            <a href="#menu"><i class="fa-solid fa-utensils"></i> Menu</a>
+            <a href="#reservations"><i class="fa-solid fa-calendar-check"></i> Book Table</a>
+            <a href="#feedback"><i class="fa-solid fa-star"></i> Feedback</a>
+            <a href="/index.html" style="margin-left: 20px; font-size: 0.9rem; opacity: 0.6;"><i
+                    class="fa-solid fa-lock"></i> Staff Login</a>
+        </nav>
+    </header>
+
+    <div class="hero">
+        <h1 class="gradient-text">Artisan Coffee & Fast Bites</h1>
+        <p>Experience the finest blend of luxury and taste. Browse our digital menu to place an order or reserve your
+            favorite spot by the window.</p>
+        <button class="btn-primary" onclick="document.getElementById('menu').scrollIntoView();"
+            style="padding: 12px 30px; font-size: 1.1rem; border-radius: 30px;">View Menu</button>
+    </div>
+
+    <div class="container">
+        <!-- About Section -->
+        <section id="about" style="margin-bottom: 80px; scroll-margin-top: 100px;">
+            <h2 class="section-title gradient-text">Our Story</h2>
+            <p class="section-subtitle">Born from a passion for perfection.</p>
+            <div class="glass-panel"
+                style="padding: 40px; text-align: center; color: var(--text-secondary); line-height: 1.8; font-size: 1.1rem;">
+                <p>Welcome to BrewCafe, where every cup tells a story. We embarked on a journey to redefine the cafe
+                    experience by blending premium artistry with modern technology. We source only the finest, ethically
+                    grown beans and perfectly pair them with our masterfully crafted quick bites.</p>
+                <p style="margin-top: 20px;">Whether you're stopping by for a quick latte or settling in for an
+                    afternoon of deep work, our space is designed to be your sanctuary. We prioritize quality, comfort,
+                    and community above all else.</p>
+            </div>
+        </section>
+
+        <!-- Menu Section -->
+        <section id="menu">
+            <h2 class="section-title gradient-text">Our Menu</h2>
+            <p class="section-subtitle">Freshly prepared, just for you.</p>
+            <div id="customerMenuGrid" class="menu-grid">
+                <!-- Dynamically populated -->
+                <div style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 40px;">Loading
+                    delicious items...</div>
+            </div>
+        </section>
+
+        <!-- Reservations Section -->
+        <section id="reservations">
+            <h2 class="section-title gradient-text">Book a Table</h2>
+            <p class="section-subtitle">Reserve a spot for your next visit or meeting.</p>
+            <div class="glass-panel form-section">
+                <form id="customerReservationForm">
+                    <div class="form-group">
+                        <label>Your Name</label>
+                        <input type="text" id="resName" required class="modern-input" placeholder="e.g. John Doe">
+                    </div>
+                    <div class="form-group" style="display: flex; gap: 15px;">
+                        <div style="flex: 1;">
+                            <label>Table Number</label>
+                            <input type="number" id="resTable" required class="modern-input" placeholder="e.g. 5">
+                        </div>
+                        <div style="flex: 1;">
+                            <label>Number of Guests</label>
+                            <input type="number" id="resGuests" required class="modern-input" placeholder="e.g. 2">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Date & Time</label>
+                        <input type="datetime-local" id="resTime" required class="modern-input">
+                    </div>
+                    <button type="submit" class="btn-primary full-width mt-4" style="padding: 12px; font-size: 1rem;"><i
+                            class="fa-solid fa-calendar-plus" style="margin-right:8px;"></i> Request Booking</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Feedback Section -->
+        <section id="feedback">
+            <h2 class="section-title gradient-text">Share Your Thoughts</h2>
+            <p class="section-subtitle">We value your experience. Help us improve.</p>
+            <div class="glass-panel form-section">
+                <form id="customerFeedbackForm">
+                    <div class="form-group">
+                        <label>Your Name (Optional)</label>
+                        <input type="text" id="fbName" class="modern-input" placeholder="Anonymous">
+                    </div>
+                    <div class="form-group">
+                        <label>Rating (1-5)</label>
+                        <select id="fbRating" class="modern-select">
+                            <option value="5">⭐⭐⭐⭐⭐ 5 - Excellent</option>
+                            <option value="4">⭐⭐⭐⭐ 4 - Very Good</option>
+                            <option value="3">⭐⭐⭐ 3 - Average</option>
+                            <option value="2">⭐⭐ 2 - Poor</option>
+                            <option value="1">⭐ 1 - Terrible</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Message</label>
+                        <textarea id="fbMessage" rows="4" required class="modern-input"
+                            placeholder="Tell us about your visit..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary full-width mt-4" style="padding: 12px; font-size: 1rem;"><i
+                            class="fa-solid fa-paper-plane" style="margin-right:8px;"></i> Submit Feedback</button>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <!-- Floating Cart Button -->
+    <div class="floating-cart">
+        <button class="cart-btn" onclick="toggleCart()">
+            <i class="fa-solid fa-bag-shopping"></i>
+            <div class="cart-badge" id="cartBadge">0</div>
+        </button>
+    </div>
+
+    <!-- Cart Overlay & Sidebar -->
+    <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+    <div class="cart-sidebar glass-panel" id="cartSidebar">
+        <div class="cart-header">
+            <h3>Your Order</h3>
+            <button class="icon-btn" onclick="toggleCart()"
+                style="background:none; border:none; color:white; cursor:pointer;"><i
+                    class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="cart-body" id="cartItemsContainer">
+            <p style="text-align:center; color: var(--text-secondary); margin-top:50px;">Your cart is empty.</p>
+        </div>
+        <div class="cart-footer">
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label style="font-size: 0.9rem;">Your Name <span style="color:var(--danger)">*</span></label>
+                <input type="text" id="cartCustomerName" class="modern-input" placeholder="e.g. Alice" required
+                    style="font-size: 0.9rem; padding: 8px; margin-bottom: 10px;">
+                <label style="font-size: 0.9rem;">Order Notes (Optional)</label>
+                <input type="text" id="cartNotes" class="modern-input" placeholder="e.g. Pick up in 15 mins..."
+                    style="font-size: 0.9rem; padding: 8px;">
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <span style="color: var(--text-secondary);">Total</span>
+                <span style="font-size: 1.5rem; font-weight: bold; color: var(--gold-primary);"
+                    id="cartTotal">₹0.00</span>
+            </div>
+            <button class="btn-primary full-width" onclick="checkout()" id="checkoutBtn"
+                style="padding: 15px; font-size: 1.1rem; border-radius: 30px;">Submit Order</button>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container"
+            style="text-align: center; padding: 40px 0; color: var(--text-secondary); border-top: 1px solid rgba(255,255,255,0.05); margin-top: 40px;">
+            <p>&copy; 2026 BrewCafe System. Powered by Agentic Intelligence.</p>
+        </div>
+    </footer>
+
+    <script src="customer.js"></script>
+</body>
+
+</html>
