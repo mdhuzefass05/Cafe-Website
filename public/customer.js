@@ -27,7 +27,7 @@ const defaultItemImages = {
     'blueberry muffin': 'https://images.unsplash.com/photo-1607958996333-41aef7caefaa?auto=format&fit=crop&w=600&q=80',
     'chocolate croissant': 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=600&q=80',
     'nachos': 'https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?auto=format&fit=crop&w=600&q=80',
-    
+
     // Category fallbacks
     'coffee': 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=600&q=80',
     'tea': 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=600&q=80',
@@ -143,8 +143,8 @@ function renderMenu() {
         if (!isAvailable) return false;
 
         const matchesCat = activeCategory === 'ALL' || (item.category && item.category.toLowerCase() === activeCategory.toLowerCase());
-        const matchesSearch = !searchQuery || 
-            item.name.toLowerCase().includes(searchQuery) || 
+        const matchesSearch = !searchQuery ||
+            item.name.toLowerCase().includes(searchQuery) ||
             (item.category && item.category.toLowerCase().includes(searchQuery)) ||
             (item.description && item.description.toLowerCase().includes(searchQuery));
 
@@ -368,6 +368,37 @@ window.closeOrderModalAndTrack = () => {
     }
 };
 
+// --- TABLE SEATING MAP & TIME SLOT SELECTION ---
+window.selectTable = (element) => {
+    document.querySelectorAll('.spatial-table-chip').forEach(chip => chip.classList.remove('active'));
+    element.classList.add('active');
+    const tableVal = element.getAttribute('data-table');
+    document.getElementById('selectedTableInput').value = tableVal;
+    showToast(`Selected ${tableVal}`, 'fa-couch');
+};
+
+window.selectTimeSlot = (time, element) => {
+    document.querySelectorAll('.time-pill').forEach(pill => pill.classList.remove('active'));
+    element.classList.add('active');
+    showToast(`Time slot: ${time}`, 'fa-clock');
+};
+
+window.adjustGuests = (delta) => {
+    const input = document.getElementById('resGuests');
+    if (!input) return;
+    let val = parseInt(input.value || '2', 10) + delta;
+    if (val < 1) val = 1;
+    if (val > 20) val = 20;
+    input.value = val;
+};
+
+// --- EMOJI RATING SELECTION ---
+window.selectEmojiRating = (rating, element) => {
+    document.querySelectorAll('.emoji-btn').forEach(btn => btn.classList.remove('active'));
+    element.classList.add('active');
+    document.getElementById('fbRatingInput').value = rating;
+};
+
 // --- RECENT ORDERS & ORDER TRACKER ---
 function saveRecentOrder(id, name, total) {
     let recent = JSON.parse(localStorage.getItem('brewcafe_recent_orders') || '[]');
@@ -412,15 +443,24 @@ window.trackOrder = async () => {
     }
 
     resultDiv.style.display = 'block';
-    resultDiv.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--text-secondary);"><i class="fa-solid fa-spinner fa-spin"></i> Checking order status...</div>`;
+    resultDiv.innerHTML = `
+        <div style="text-align: center; padding: 25px;">
+            <div class="radar-scanner-box">
+                <div class="radar-sweep-line"></div>
+                <i class="fa-solid fa-satellite-dish" style="color:var(--spatial-gold); font-size:1.8rem; z-index:2;"></i>
+            </div>
+            <p style="color: rgba(255,255,255,0.7); font-weight: 600; font-size: 0.95rem;">Scanning spatial telemetry for Order #${orderId}...</p>
+        </div>
+    `;
 
     try {
         const res = await fetch(`${API_BASE}/orders/${orderId}`);
         if (res.status === 404) {
             resultDiv.innerHTML = `
                 <div style="text-align: center; padding: 25px; color: var(--danger);">
-                    <i class="fa-solid fa-circle-xmark" style="font-size: 2rem; margin-bottom: 10px;"></i>
-                    <p>Order #${orderId} not found. Please verify your order number.</p>
+                    <i class="fa-solid fa-circle-xmark" style="font-size: 2.2rem; margin-bottom: 10px;"></i>
+                    <p style="font-size: 1.05rem; font-weight: 600;">Order #${orderId} Not Found</p>
+                    <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">Please check your receipt or order history badge.</p>
                 </div>
             `;
             return;
@@ -441,12 +481,12 @@ window.trackOrder = async () => {
                 <div class="order-status-card fade-in" style="border-color: var(--danger);">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                         <div>
-                            <h3 style="margin: 0;">Order #${order.id}</h3>
-                            <span style="color: var(--text-secondary); font-size: 0.9rem;">Customer: ${order.customer_name || 'Guest'}</span>
+                            <h3 style="margin: 0; font-size: 1.3rem;">Order #${order.id}</h3>
+                            <span style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">Customer: ${order.customer_name || 'Guest'}</span>
                         </div>
-                        <span style="background: rgba(231,76,60,0.2); color: var(--danger); padding: 6px 14px; border-radius: 20px; font-weight: 600; font-size: 0.9rem;">Cancelled</span>
+                        <span style="background: rgba(231,76,60,0.2); color: var(--danger); padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 0.9rem;">Cancelled</span>
                     </div>
-                    <p style="color: var(--text-secondary); font-size: 0.95rem;">This order was cancelled by the store. Please contact staff for details.</p>
+                    <p style="color: rgba(255,255,255,0.7); font-size: 0.95rem;">This order was cancelled. Please check with cafe staff.</p>
                 </div>
             `;
             return;
@@ -454,16 +494,22 @@ window.trackOrder = async () => {
 
         resultDiv.innerHTML = `
             <div class="order-status-card fade-in">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <!-- Header Info -->
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.08);">
                     <div>
-                        <h3 style="margin: 0; font-size: 1.25rem;">Order #${order.id}</h3>
-                        <span style="color: var(--text-secondary); font-size: 0.9rem;">Customer: <strong>${order.customer_name || 'Guest'}</strong></span>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <h3 style="margin: 0; font-size: 1.35rem; font-weight:800;">Order #${order.id}</h3>
+                            <span style="background: rgba(226,183,68,0.18); color: var(--spatial-gold); border: 1px solid rgba(226,183,68,0.4); padding: 3px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Live Telemetry</span>
+                        </div>
+                        <span style="color: rgba(255,255,255,0.7); font-size: 0.92rem; margin-top:4px; display:block;">Customer: <strong>${order.customer_name || 'Guest'}</strong></span>
                     </div>
                     <div style="text-align: right;">
-                        <span style="color: var(--gold-primary); font-weight: 700; font-size: 1.2rem;">₹${order.total_price.toFixed(2)}</span>
+                        <span style="color: var(--spatial-gold); font-weight: 800; font-size: 1.4rem;">₹${order.total_price.toFixed(2)}</span>
+                        <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5);"><i class="fa-solid fa-hourglass-half"></i> ${isCompleted ? 'Served' : '~8 Mins Prep Left'}</div>
                     </div>
                 </div>
 
+                <!-- Stage Stepper -->
                 <div class="status-stepper">
                     <div class="step-item ${isReceived ? 'completed' : ''}">
                         <div class="step-icon"><i class="fa-solid fa-receipt"></i></div>
@@ -479,16 +525,20 @@ window.trackOrder = async () => {
                     </div>
                 </div>
 
-                <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin-top: 15px;">
-                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 4px;">Order Summary:</div>
-                    <div style="color: white; font-weight: 500;">${order.items}</div>
-                    ${order.notes ? `<div style="font-size: 0.85rem; color: var(--gold-primary); margin-top: 6px;"><i class="fa-solid fa-pen"></i> Notes: ${order.notes}</div>` : ''}
+                <!-- Digital Receipt & Barcode Visual -->
+                <div style="background: rgba(0,0,0,0.3); padding: 18px; border-radius: 16px; margin-top: 20px; border: 1px dashed rgba(255,255,255,0.15);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+                        <span style="font-size: 0.85rem; color: rgba(255,255,255,0.6); text-transform:uppercase; letter-spacing:0.5px;">Itemized Breakdown</span>
+                        <span style="font-family: monospace; font-size:0.75rem; color:rgba(255,255,255,0.4);">||||| ||| | |||||</span>
+                    </div>
+                    <div style="color: white; font-weight: 600; font-size:1.02rem;">${order.items}</div>
+                    ${order.notes ? `<div style="font-size: 0.88rem; color: var(--spatial-gold); margin-top: 8px;"><i class="fa-solid fa-pen"></i> Notes: ${order.notes}</div>` : ''}
                 </div>
             </div>
         `;
     } catch (err) {
         console.error(err);
-        resultDiv.innerHTML = `<div style="text-align: center; color: var(--danger); padding: 20px;">Failed to query order details.</div>`;
+        resultDiv.innerHTML = `<div style="text-align: center; color: var(--danger); padding: 20px;">Failed to query order telemetry details.</div>`;
     }
 };
 
@@ -499,14 +549,18 @@ function setupForms() {
         e.preventDefault();
         const btn = e.target.querySelector('button[type="submit"]');
         btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting Reservation...';
+
+        const selectedTable = document.getElementById('selectedTableInput')?.value || 'Table 01';
+        const userNotes = document.getElementById('resRequests').value.trim();
+        const fullNotes = userNotes ? `[${selectedTable}] ${userNotes}` : `[${selectedTable}]`;
 
         const payload = {
             customer_name: document.getElementById('resName').value,
             contact_info: document.getElementById('resContact').value,
             guests: parseInt(document.getElementById('resGuests').value, 10),
             reservation_time: document.getElementById('resTime').value,
-            special_requests: document.getElementById('resRequests').value
+            special_requests: fullNotes
         };
 
         try {
@@ -517,7 +571,7 @@ function setupForms() {
             });
 
             if (res.ok) {
-                showToast("Table booking request sent! We look forward to welcoming you.", "fa-calendar-check");
+                showToast(`Table booking confirmed for ${selectedTable}!`, "fa-calendar-check");
                 e.target.reset();
             } else {
                 showToast("Error submitting table reservation.", "fa-circle-xmark");
@@ -527,7 +581,7 @@ function setupForms() {
             showToast("Network error submitting reservation.", "fa-wifi");
         } finally {
             btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-calendar-plus" style="margin-right:8px;"></i> Confirm Booking Request';
+            btn.innerHTML = '<i class="fa-solid fa-calendar-check"></i> Reserve Selected Table';
         }
     });
 
@@ -536,11 +590,12 @@ function setupForms() {
         e.preventDefault();
         const btn = e.target.querySelector('button[type="submit"]');
         btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting Review...';
 
+        const ratingVal = parseInt(document.getElementById('fbRatingInput')?.value || '5', 10);
         const payload = {
             customer_name: document.getElementById('fbName').value.trim() || 'Anonymous Coffee Lover',
-            rating: parseInt(document.getElementById('fbRating').value, 10),
+            rating: ratingVal,
             message: document.getElementById('fbMessage').value.trim()
         };
 
@@ -552,7 +607,7 @@ function setupForms() {
             });
 
             if (res.ok) {
-                showToast("Thank you for your valuable feedback!", "fa-heart");
+                showToast("Thank you for sharing your experience!", "fa-heart");
                 e.target.reset();
                 fetchRecentFeedback();
             } else {
@@ -563,12 +618,12 @@ function setupForms() {
             showToast("Network error submitting feedback.", "fa-wifi");
         } finally {
             btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-paper-plane" style="margin-right:8px;"></i> Submit Review';
+            btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Share My Experience';
         }
     });
 }
 
-// --- FEEDBACK WALL ---
+// --- SPATIAL TESTIMONIAL REVIEW WALL ---
 async function fetchRecentFeedback() {
     const wall = document.getElementById('feedbackWall');
     if (!wall) return;
@@ -592,22 +647,39 @@ function renderFeedbackWall(reviews) {
     const recentReviews = Array.isArray(reviews) ? reviews.slice(0, 6) : [];
 
     if (recentReviews.length === 0) {
-        wall.innerHTML = `<p style="text-align: center; color: var(--text-secondary); grid-column: 1/-1;">Be the first to leave a review!</p>`;
+        wall.innerHTML = `<p style="text-align: center; color: rgba(255,255,255,0.6); grid-column: 1/-1;">Be the first to share your cafe review!</p>`;
         return;
     }
 
     recentReviews.forEach(r => {
-        const card = document.createElement('div');
-        card.className = 'feedback-card fade-in';
+        const name = r.customer_name || 'Coffee Enthusiast';
+        const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=80`;
         const starsHtml = '⭐'.repeat(r.rating || 5);
+
+        const card = document.createElement('div');
+        card.className = 'spatial-card fade-in';
+        card.style.padding = '22px';
         card.innerHTML = `
-            <div class="stars">${starsHtml}</div>
-            <p style="color: white; font-size: 0.95rem; font-style: italic; margin-bottom: 12px; line-height: 1.5;">"${r.message}"</p>
-            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--gold-primary);">
-                <strong>- ${r.customer_name || 'Anonymous'}</strong>
-                <span style="color: var(--text-secondary);">${new Date(r.created_at || Date.now()).toLocaleDateString()}</span>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <img src="${avatarUrl}" alt="${name}" style="width: 42px; height: 42px; border-radius: 50%; border: 1.5px solid var(--spatial-gold);">
+                    <div>
+                        <strong style="color: #fff; font-size: 0.98rem; display: block;">${name}</strong>
+                        <span style="color: rgba(255,255,255,0.5); font-size: 0.78rem;"><i class="fa-solid fa-circle-check" style="color:#2ecc71;"></i> Verified Guest</span>
+                    </div>
+                </div>
+                <div style="font-size: 0.9rem;">${starsHtml}</div>
+            </div>
+            <p style="color: rgba(255,255,255,0.85); font-size: 0.95rem; font-style: italic; line-height: 1.55; margin-bottom: 14px;">
+                <i class="fa-solid fa-quote-left" style="color: var(--spatial-gold); opacity: 0.5; margin-right: 4px;"></i>
+                ${r.message}
+                <i class="fa-solid fa-quote-right" style="color: var(--spatial-gold); opacity: 0.5; margin-left: 4px;"></i>
+            </p>
+            <div style="text-align: right; font-size: 0.78rem; color: rgba(255,255,255,0.4);">
+                ${new Date(r.created_at || Date.now()).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
             </div>
         `;
         wall.appendChild(card);
     });
 }
+
