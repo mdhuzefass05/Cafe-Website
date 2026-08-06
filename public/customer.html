@@ -4,174 +4,661 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BrewCafe - Order & Relax</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>BrewCafe - Spatial Customer Experience</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <style>
-        body {
-            padding-top: 80px;
-            scroll-behavior: smooth;
+        :root {
+            --font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+            --spatial-bg: #09090e;
+            --spatial-glass: rgba(22, 22, 32, 0.55);
+            --spatial-glass-card: rgba(28, 28, 42, 0.45);
+            --spatial-blur: blur(28px) saturate(190%);
+            --spatial-border: rgba(255, 255, 255, 0.12);
+            --spatial-border-highlight: rgba(255, 255, 255, 0.28);
+            --spatial-gold: #e2b744;
+            --spatial-gold-glow: rgba(226, 183, 68, 0.35);
+            --spatial-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
         }
 
-        .customer-header {
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--spatial-bg);
+            color: #ffffff;
+            margin: 0;
+            padding-top: 110px;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            perspective: 1200px;
+        }
+
+        /* --- SPATIAL AMBIENT BACKGROUND ORBS --- */
+        .spatial-bg-orbs {
             position: fixed;
             top: 0;
             left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(90px);
+            opacity: 0.45;
+            animation: orbFloat 22s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .orb-1 {
+            width: 550px;
+            height: 550px;
+            background: radial-gradient(circle, rgba(226, 183, 68, 0.45) 0%, rgba(212, 175, 55, 0) 70%);
+            top: -100px;
+            left: -100px;
+        }
+
+        .orb-2 {
+            width: 650px;
+            height: 650px;
+            background: radial-gradient(circle, rgba(138, 43, 226, 0.35) 0%, rgba(75, 0, 130, 0) 70%);
+            bottom: -150px;
+            right: -100px;
+            animation-delay: -7s;
+        }
+
+        .orb-3 {
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, rgba(0, 191, 255, 0.25) 0%, rgba(0, 100, 200, 0) 70%);
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -14s;
+        }
+
+        @keyframes orbFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(60px, 40px) scale(1.1); }
+            100% { transform: translate(-40px, 80px) scale(0.95); }
+        }
+
+        /* --- DETACHED FLOATING SPATIAL HEADER --- */
+        .spatial-header-wrapper {
+            position: fixed;
+            top: 20px;
+            left: 0;
             width: 100%;
+            display: flex;
+            justify-content: center;
             z-index: 1000;
-            padding: 15px 40px;
+            padding: 0 20px;
+        }
+
+        .spatial-header {
+            width: 100%;
+            max-width: 1100px;
+            padding: 12px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(15, 15, 20, 0.85);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: var(--spatial-glass);
+            backdrop-filter: var(--spatial-blur);
+            -webkit-backdrop-filter: var(--spatial-blur);
+            border: 1px solid var(--spatial-border);
+            border-top: 1px solid var(--spatial-border-highlight);
+            border-radius: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
         }
 
-        .hero {
+        .spatial-header .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .spatial-header .logo i {
+            color: var(--spatial-gold);
+            font-size: 1.6rem;
+            filter: drop-shadow(0 0 10px var(--spatial-gold-glow));
+        }
+
+        .spatial-header .logo h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 22px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.92rem;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+        }
+
+        .nav-staff-btn {
+            background: rgba(226, 183, 68, 0.15) !important;
+            border: 1px solid rgba(226, 183, 68, 0.4);
+            color: var(--spatial-gold) !important;
+            font-weight: 600 !important;
+        }
+
+        .nav-staff-btn:hover {
+            background: var(--spatial-gold) !important;
+            color: #000000 !important;
+            box-shadow: 0 0 20px var(--spatial-gold-glow) !important;
+        }
+
+        /* --- SPATIAL GLASS CARD CONTAINER --- */
+        .spatial-card {
+            background: var(--spatial-glass-card);
+            backdrop-filter: var(--spatial-blur);
+            -webkit-backdrop-filter: var(--spatial-blur);
+            border: 1px solid var(--spatial-border);
+            border-top: 1px solid var(--spatial-border-highlight);
+            border-radius: 28px;
+            box-shadow: var(--spatial-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+            transform-style: preserve-3d;
+        }
+
+        /* --- SPATIAL HERO SECTION --- */
+        .hero-spatial {
+            position: relative;
+            max-width: 1100px;
+            margin: 20px auto 70px auto;
+            padding: 80px 40px;
             text-align: center;
-            padding: 100px 20px 80px 20px;
+            border-radius: 36px;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(28, 28, 42, 0.6) 0%, rgba(15, 15, 24, 0.8) 100%), 
+                        url('https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+            background-blend-mode: overlay;
         }
 
-        .hero h1 {
-            font-size: 3.5rem;
-            margin-bottom: 15px;
+        .spatial-pill-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(226, 183, 68, 0.15);
+            border: 1px solid rgba(226, 183, 68, 0.4);
+            color: var(--spatial-gold);
+            padding: 8px 22px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
         }
 
-        .hero p {
-            color: var(--text-secondary);
-            font-size: 1.2rem;
-            max-width: 600px;
-            margin: 0 auto 30px auto;
+        .hero-spatial h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 22px;
+            letter-spacing: -1px;
+            text-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        }
+
+        .hero-spatial p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.3rem;
+            max-width: 680px;
+            margin: 0 auto 40px auto;
+            line-height: 1.6;
+        }
+
+        .hero-cta {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+
+        .btn-spatial-primary {
+            background: linear-gradient(135deg, var(--spatial-gold), #d4af37);
+            color: #000000;
+            font-weight: 700;
+            padding: 15px 38px;
+            border-radius: 30px;
+            border: none;
+            font-size: 1.05rem;
+            cursor: pointer;
+            box-shadow: 0 10px 25px var(--spatial-gold-glow), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-spatial-primary:hover {
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 18px 35px var(--spatial-gold-glow), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        .btn-spatial-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            color: #ffffff;
+            font-weight: 600;
+            padding: 15px 32px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.35);
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-spatial-secondary:hover {
+            background: rgba(255, 255, 255, 0.16);
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            margin-top: 55px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 15px 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-card .val {
+            font-size: 1.9rem;
+            font-weight: 800;
+            color: var(--spatial-gold);
+        }
+
+        .stat-card .lbl {
+            font-size: 0.82rem;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin-top: 4px;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1100px;
             margin: 0 auto;
             padding: 0 20px;
         }
 
         .section-title {
-            font-size: 2.2rem;
+            font-size: 2.5rem;
+            font-weight: 800;
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
         }
 
         .section-subtitle {
             text-align: center;
-            color: var(--text-secondary);
+            color: rgba(255, 255, 255, 0.6);
             margin-bottom: 40px;
+            font-size: 1.1rem;
         }
 
+        /* --- SPATIAL FILTER CONTROLS --- */
+        .filter-container {
+            margin-bottom: 45px;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+            width: 100%;
+            max-width: 520px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 16px 50px 16px 50px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-top: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 35px;
+            color: white;
+            font-size: 1.02rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--spatial-gold);
+            background: rgba(255, 255, 255, 0.09);
+            box-shadow: 0 0 25px var(--spatial-gold-glow);
+        }
+
+        .search-box i.search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 1.1rem;
+        }
+
+        .search-box i.clear-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            display: none;
+        }
+
+        .category-pills {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .cat-pill {
+            padding: 10px 22px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .cat-pill:hover, .cat-pill.active {
+            background: var(--spatial-gold);
+            color: #000000;
+            border-color: var(--spatial-gold);
+            font-weight: 700;
+            box-shadow: 0 8px 20px var(--spatial-gold-glow);
+            transform: translateY(-2px);
+        }
+
+        /* --- SPATIAL MENU GRID & CARDS --- */
         .menu-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 25px;
-            margin-bottom: 80px;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 30px;
+            margin-bottom: 90px;
         }
 
-        .menu-card {
-            padding: 25px;
-            text-align: center;
+        .spatial-menu-card {
+            border-radius: 24px;
+            overflow: hidden;
+            position: relative;
+            background: var(--spatial-glass-card);
+            backdrop-filter: var(--spatial-blur);
+            -webkit-backdrop-filter: var(--spatial-blur);
+            border: 1px solid var(--spatial-border);
+            border-top: 1px solid var(--spatial-border-highlight);
+            box-shadow: var(--spatial-shadow);
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+            transform-style: preserve-3d;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            align-items: center;
-            transition: transform 0.3s;
         }
 
-        .menu-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(212, 175, 55, 0.5);
+        .spatial-menu-card:hover {
+            transform: translateY(-8px) rotateX(4deg) rotateY(-2deg) translateZ(15px);
+            border-color: rgba(226, 183, 68, 0.5);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.65), 0 0 30px var(--spatial-gold-glow);
         }
 
-        .menu-card h3 {
-            font-size: 1.3rem;
-            margin-bottom: 5px;
-            color: white;
+        .menu-img-wrapper {
+            position: relative;
+            height: 195px;
+            width: 100%;
+            overflow: hidden;
+            background: #000;
         }
 
-        .menu-card p.cat {
-            color: var(--gold-primary);
-            margin-bottom: 15px;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        .menu-card-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        .menu-card .price {
-            font-size: 1.6rem;
+        .spatial-menu-card:hover .menu-card-img {
+            transform: scale(1.1);
+        }
+
+        .btn-add-spatial {
+            background: rgba(226, 183, 68, 0.18);
+            border: 1px solid var(--spatial-gold);
+            color: var(--spatial-gold);
+            padding: 9px 20px;
+            border-radius: 20px;
+            font-size: 0.92rem;
             font-weight: 700;
-            color: white;
-            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .form-section {
-            max-width: 600px;
-            margin: 0 auto 80px auto;
+        .btn-add-spatial:hover {
+            background: var(--spatial-gold);
+            color: #000000;
+            box-shadow: 0 0 20px var(--spatial-gold-glow);
+        }
+
+        /* --- TRACKER & FORMS SPATIAL SECTIONS --- */
+        .spatial-section-card {
+            max-width: 750px;
+            margin: 0 auto 90px auto;
             padding: 40px;
         }
 
+        .tracker-input-group {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 30px;
+        }
+
+        .tracker-input-group input {
+            flex: 1;
+            padding: 16px 22px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-top: 1px solid rgba(255, 255, 255, 0.25);
+            color: white;
+            font-size: 1.05rem;
+        }
+
+        .order-status-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 28px;
+            margin-top: 20px;
+        }
+
+        .status-stepper {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin: 35px 0 25px 0;
+        }
+
+        .status-stepper::before {
+            content: '';
+            position: absolute;
+            top: 22px;
+            left: 10%;
+            right: 10%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.12);
+            z-index: 1;
+        }
+
+        .step-item {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            flex: 1;
+        }
+
+        .step-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px auto;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .step-item.completed .step-icon {
+            background: #2ecc71;
+            border-color: #2ecc71;
+            color: white;
+            box-shadow: 0 0 18px rgba(46, 204, 113, 0.5);
+        }
+
+        .step-item.active .step-icon {
+            background: var(--spatial-gold);
+            border-color: var(--spatial-gold);
+            color: black;
+            box-shadow: 0 0 20px var(--spatial-gold-glow);
+        }
+
+        .recent-order-badge {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 7px 16px;
+            border-radius: 25px;
+            font-size: 0.88rem;
+            cursor: pointer;
+            color: var(--spatial-gold);
+            transition: all 0.25s ease;
+        }
+
+        .recent-order-badge:hover {
+            background: rgba(226, 183, 68, 0.2);
+            box-shadow: 0 0 15px var(--spatial-gold-glow);
+        }
+
+        /* --- FLOATING SPATIAL CART DRAWER --- */
         .floating-cart {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
+            bottom: 35px;
+            right: 35px;
             z-index: 999;
         }
 
         .cart-btn {
-            background: var(--gold-primary);
-            color: #000;
-            width: 65px;
-            height: 65px;
+            background: linear-gradient(135deg, var(--spatial-gold), #d4af37);
+            color: #000000;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
-            font-size: 1.5rem;
+            font-size: 1.7rem;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.4);
+            box-shadow: 0 15px 35px var(--spatial-gold-glow), inset 0 1px 0 rgba(255, 255, 255, 0.5);
             border: none;
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
         .cart-btn:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 15px 30px rgba(212, 175, 55, 0.6);
+            transform: translateY(-6px) scale(1.08);
         }
 
         .cart-badge {
             position: absolute;
-            top: 0;
-            right: 0;
+            top: -2px;
+            right: -2px;
             background: #e74c3c;
             color: white;
             border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            font-size: 0.8rem;
+            width: 26px;
+            height: 26px;
+            font-size: 0.85rem;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            border: 2px solid var(--bg-primary);
+            border: 2px solid var(--spatial-bg);
         }
 
-        /* Cart Sidebar */
         .cart-sidebar {
             position: fixed;
             top: 0;
-            right: -400px;
-            width: 400px;
+            right: -440px;
+            width: 440px;
+            max-width: 92vw;
             height: 100vh;
-            background: var(--bg-secondary);
-            border-left: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(18, 18, 28, 0.85);
+            backdrop-filter: var(--spatial-blur);
+            -webkit-backdrop-filter: var(--spatial-blur);
+            border-left: 1px solid var(--spatial-border);
             z-index: 1001;
-            transition: right 0.3s ease;
+            transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
             flex-direction: column;
-            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+            box-shadow: -20px 0 50px rgba(0, 0, 0, 0.8);
         }
 
         .cart-sidebar.open {
@@ -179,8 +666,8 @@
         }
 
         .cart-header {
-            padding: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -189,13 +676,13 @@
         .cart-body {
             flex: 1;
             overflow-y: auto;
-            padding: 20px;
+            padding: 22px;
         }
 
         .cart-footer {
-            padding: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            background: rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(0, 0, 0, 0.35);
         }
 
         .cart-overlay {
@@ -204,10 +691,10 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(6px);
             z-index: 1000;
             display: none;
-            backdrop-filter: blur(3px);
         }
 
         .cart-item {
@@ -215,178 +702,300 @@
             justify-content: space-between;
             align-items: center;
             padding: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            margin-bottom: 10px;
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        .cart-item-info {
-            flex: 1;
-        }
-
-        .cart-item-title {
-            font-weight: 500;
-            font-size: 1.1rem;
-        }
-
-        .cart-item-price {
-            color: var(--gold-primary);
-            font-size: 0.9rem;
-            margin-top: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            margin-bottom: 12px;
+            background: rgba(255, 255, 255, 0.03);
         }
 
         .qty-controls {
             display: flex;
             align-items: center;
             gap: 10px;
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.07);
             border-radius: 20px;
-            padding: 5px 10px;
+            padding: 6px 12px;
         }
 
-        .qty-btn {
-            background: none;
-            border: none;
+        /* --- SPATIAL RECEIPT MODAL --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.78);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background: rgba(24, 24, 38, 0.85);
+            backdrop-filter: var(--spatial-blur);
+            border: 1px solid var(--spatial-gold);
+            border-top: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 30px;
+            max-width: 520px;
+            width: 100%;
+            padding: 40px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 35px var(--spatial-gold-glow);
+            animation: spatialPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes spatialPop {
+            from { transform: scale(0.8) translateZ(-50px); opacity: 0; }
+            to { transform: scale(1) translateZ(0); opacity: 1; }
+        }
+
+        /* --- SPATIAL TOAST CONTAINER --- */
+        .toast-container {
+            position: fixed;
+            top: 100px;
+            right: 30px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: rgba(28, 28, 42, 0.9);
+            backdrop-filter: var(--spatial-blur);
+            border: 1px solid var(--spatial-gold);
             color: white;
-            cursor: pointer;
-            font-size: 0.9rem;
+            padding: 15px 24px;
+            border-radius: 16px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6), 0 0 20px var(--spatial-gold-glow);
+            font-size: 0.96rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: toastIn 0.35s ease forwards;
+            pointer-events: auto;
         }
 
-        .qty-btn:hover {
-            color: var(--gold-primary);
-        }
-
-        .nav-links a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: var(--gold-primary);
+        @keyframes toastIn {
+            from { transform: translateX(120%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
     </style>
 </head>
 
-<body class="dark-theme">
-    <header class="customer-header">
-        <div class="logo">
-            <i class="fa-solid fa-mug-hot"
-                style="color: var(--gold-primary); font-size: 1.5rem; margin-right: 10px;"></i>
-            <h2 class="gradient-text" style="display:inline; margin:0; font-size:1.5rem;">BrewCafe</h2>
-        </div>
-        <nav class="nav-links" style="display: flex; gap: 30px; align-items: center;">
-            <a href="#about"><i class="fa-solid fa-users"></i> About Us</a>
-            <a href="#menu"><i class="fa-solid fa-utensils"></i> Menu</a>
-            <a href="#reservations"><i class="fa-solid fa-calendar-check"></i> Book Table</a>
-            <a href="#feedback"><i class="fa-solid fa-star"></i> Feedback</a>
-            <a href="/index.html" style="margin-left: 20px; font-size: 0.9rem; opacity: 0.6;"><i
-                    class="fa-solid fa-lock"></i> Staff Login</a>
-        </nav>
-    </header>
+<body>
+    <!-- Spatial Ambient Background Orbs -->
+    <div class="spatial-bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
 
-    <div class="hero">
-        <h1 class="gradient-text">Artisan Coffee & Fast Bites</h1>
-        <p>Experience the finest blend of luxury and taste. Browse our digital menu to place an order or reserve your
-            favorite spot by the window.</p>
-        <button class="btn-primary" onclick="document.getElementById('menu').scrollIntoView();"
-            style="padding: 12px 30px; font-size: 1.1rem; border-radius: 30px;">View Menu</button>
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Detached Spatial Floating Header -->
+    <div class="spatial-header-wrapper">
+        <header class="spatial-header">
+            <a href="#" class="logo">
+                <i class="fa-solid fa-mug-hot"></i>
+                <h2 class="gradient-text">BrewCafe</h2>
+            </a>
+            <nav class="nav-links">
+                <a href="#about"><i class="fa-solid fa-circle-info"></i> About</a>
+                <a href="#menu"><i class="fa-solid fa-utensils"></i> Menu</a>
+                <a href="#tracker"><i class="fa-solid fa-route"></i> Track Order</a>
+                <a href="#reservations"><i class="fa-solid fa-calendar-check"></i> Book Table</a>
+                <a href="#feedback"><i class="fa-solid fa-star"></i> Feedback</a>
+                <a href="/index.html" class="nav-staff-btn"><i class="fa-solid fa-lock"></i> Staff Portal</a>
+            </nav>
+        </header>
+    </div>
+
+    <!-- Spatial Hero Banner -->
+    <div class="hero-spatial spatial-card">
+        <div class="spatial-pill-badge fade-in">
+            <i class="fa-solid fa-sparkles"></i> Visionary Spatial Experience
+        </div>
+        <h1 class="gradient-text fade-in stagger-1">Handcrafted Coffee &<br>Gourmet Culinary Art</h1>
+        <p class="fade-in stagger-2">Step into the future of cafe dining. Savor organic single-origin beans, fresh bakeries, and chef specials in immersive spatial luxury.</p>
+        <div class="hero-cta fade-in stagger-3">
+            <button class="btn-spatial-primary" onclick="document.getElementById('menu').scrollIntoView();">
+                <i class="fa-solid fa-utensils"></i> Explore Menu
+            </button>
+            <button class="btn-spatial-secondary" onclick="document.getElementById('tracker').scrollIntoView();">
+                <i class="fa-solid fa-magnifying-glass"></i> Live Order Tracker
+            </button>
+        </div>
+        <div class="hero-stats fade-in stagger-3">
+            <div class="stat-card">
+                <div class="val">4.9 ★</div>
+                <div class="lbl">Customer Rating</div>
+            </div>
+            <div class="stat-card">
+                <div class="val">15 Mins</div>
+                <div class="lbl">Avg. Prep Time</div>
+            </div>
+            <div class="stat-card">
+                <div class="val">100%</div>
+                <div class="lbl">Organic Beans</div>
+            </div>
+        </div>
     </div>
 
     <div class="container">
         <!-- About Section -->
-        <section id="about" style="margin-bottom: 80px; scroll-margin-top: 100px;">
-            <h2 class="section-title gradient-text">Our Story</h2>
-            <p class="section-subtitle">Born from a passion for perfection.</p>
-            <div class="glass-panel"
-                style="padding: 40px; text-align: center; color: var(--text-secondary); line-height: 1.8; font-size: 1.1rem;">
-                <p>Welcome to BrewCafe, where every cup tells a story. We embarked on a journey to redefine the cafe
-                    experience by blending premium artistry with modern technology. We source only the finest, ethically
-                    grown beans and perfectly pair them with our masterfully crafted quick bites.</p>
-                <p style="margin-top: 20px;">Whether you're stopping by for a quick latte or settling in for an
-                    afternoon of deep work, our space is designed to be your sanctuary. We prioritize quality, comfort,
-                    and community above all else.</p>
+        <section id="about" style="margin-bottom: 90px; scroll-margin-top: 120px;">
+            <h2 class="section-title gradient-text">Our Coffee Story</h2>
+            <p class="section-subtitle">A passion for flavor, comfort, and community.</p>
+            <div class="spatial-card" style="padding: 0; overflow: hidden; max-width: 1050px; margin: 0 auto; display: flex; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 320px; min-height: 340px; position: relative;">
+                    <img src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=800&q=80" alt="BrewCafe Artisan Coffee" style="width: 100%; height: 100%; object-fit: cover;">
+                    <div style="position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0,0,0,0.1) 0%, rgba(15,15,24,0.85) 100%);"></div>
+                </div>
+                <div style="flex: 1.2; min-width: 320px; padding: 45px; display: flex; flex-direction: column; justify-content: center; color: rgba(255,255,255,0.75); line-height: 1.8; font-size: 1.1rem;">
+                    <h3 style="color: #fff; font-size: 1.65rem; margin-bottom: 15px; font-weight: 700;">Crafted with Precision & Love</h3>
+                    <p>At BrewCafe, coffee is an artform. We source high-altitude beans directly from sustainable micro-farms across the globe, roasting them in small batches to preserve their nuanced aromas and natural sweetness.</p>
+                    <p style="margin-top: 15px;">Whether you're picking up a quick espresso on your morning commute or settling in for an afternoon meeting with friends, our space offers the perfect harmony of rich flavors and modern spatial atmosphere.</p>
+                </div>
             </div>
         </section>
 
         <!-- Menu Section -->
-        <section id="menu">
-            <h2 class="section-title gradient-text">Our Menu</h2>
-            <p class="section-subtitle">Freshly prepared, just for you.</p>
+        <section id="menu" style="scroll-margin-top: 120px;">
+            <h2 class="section-title gradient-text">Explore Our Menu</h2>
+            <p class="section-subtitle">Freshly crafted drinks and gourmet bites.</p>
+            
+            <!-- Search & Filter Controls -->
+            <div class="filter-container">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" id="menuSearch" placeholder="Search latte, muffin, espresso, pizza...">
+                    <i class="fa-solid fa-xmark clear-icon" id="clearSearchBtn"></i>
+                </div>
+                <div class="category-pills" id="categoryPills">
+                    <button class="cat-pill active" data-category="ALL">All Items</button>
+                    <button class="cat-pill" data-category="Coffee">Coffee</button>
+                    <button class="cat-pill" data-category="Tea">Tea</button>
+                    <button class="cat-pill" data-category="Bakery">Bakery</button>
+                    <button class="cat-pill" data-category="Snacks">Snacks</button>
+                    <button class="cat-pill" data-category="Beverages">Beverages</button>
+                    <button class="cat-pill" data-category="Desserts">Desserts</button>
+                </div>
+            </div>
+
+            <!-- Spatial Menu Grid -->
             <div id="customerMenuGrid" class="menu-grid">
-                <!-- Dynamically populated -->
-                <div style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 40px;">Loading
-                    delicious items...</div>
+                <div style="grid-column: 1/-1; text-align: center; color: rgba(255,255,255,0.6); padding: 50px;">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; color: var(--spatial-gold); margin-bottom: 15px;"></i>
+                    <p>Loading spatial menu items...</p>
+                </div>
             </div>
         </section>
 
-        <!-- Reservations Section -->
-        <section id="reservations">
+        <!-- Order Tracker Section -->
+        <section id="tracker" style="scroll-margin-top: 120px;">
+            <h2 class="section-title gradient-text">Track Your Order</h2>
+            <p class="section-subtitle">Enter your Order ID to view real-time preparation status.</p>
+            <div class="spatial-card spatial-section-card">
+                <div class="tracker-input-group">
+                    <input type="number" id="trackOrderIdInput" placeholder="e.g. 104" min="1">
+                    <button class="btn-spatial-primary" onclick="trackOrder()" style="padding: 0 30px; border-radius: 16px;">
+                        <i class="fa-solid fa-magnifying-glass"></i> Track
+                    </button>
+                </div>
+
+                <div id="recentOrdersContainer" style="margin-bottom: 20px; display: none;">
+                    <span style="font-size: 0.88rem; color: rgba(255,255,255,0.6);">Your Recent Orders:</span>
+                    <div class="recent-orders-pills" id="recentOrdersList" style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;"></div>
+                </div>
+
+                <!-- Status Output Card -->
+                <div id="trackerResult" style="display: none;"></div>
+            </div>
+        </section>
+
+        <!-- Table Reservations Section -->
+        <section id="reservations" style="scroll-margin-top: 120px;">
             <h2 class="section-title gradient-text">Book a Table</h2>
-            <p class="section-subtitle">Reserve a spot for your next visit or meeting.</p>
-            <div class="glass-panel form-section">
+            <p class="section-subtitle">Reserve a cozy spot in our spatial lounge.</p>
+            <div class="spatial-card spatial-section-card">
                 <form id="customerReservationForm">
-                    <div class="form-group">
-                        <label>Your Name</label>
-                        <input type="text" id="resName" required class="modern-input" placeholder="e.g. John Doe">
-                    </div>
-                    <div class="form-group" style="display: flex; gap: 15px;">
-                        <div style="flex: 1;">
-                            <label>Table Number</label>
-                            <input type="number" id="resTable" required class="modern-input" placeholder="e.g. 5">
+                    <div class="form-group" style="display: flex; gap: 18px; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 220px;">
+                            <label style="font-size:0.9rem; color:rgba(255,255,255,0.7);"><i class="fa-solid fa-user"></i> Your Name</label>
+                            <input type="text" id="resName" required class="modern-input" placeholder="e.g. Sarah Jenkins" style="padding:14px; margin-top:6px;">
                         </div>
-                        <div style="flex: 1;">
-                            <label>Number of Guests</label>
-                            <input type="number" id="resGuests" required class="modern-input" placeholder="e.g. 2">
+                        <div style="flex: 1; min-width: 220px;">
+                            <label style="font-size:0.9rem; color:rgba(255,255,255,0.7);"><i class="fa-solid fa-phone"></i> Contact (Phone/Email)</label>
+                            <input type="text" id="resContact" required class="modern-input" placeholder="e.g. sarah@example.com" style="padding:14px; margin-top:6px;">
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label>Date & Time</label>
-                        <input type="datetime-local" id="resTime" required class="modern-input">
+                    <div class="form-group" style="display: flex; gap: 18px; flex-wrap: wrap; margin-top:15px;">
+                        <div style="flex: 1; min-width: 220px;">
+                            <label style="font-size:0.9rem; color:rgba(255,255,255,0.7);"><i class="fa-solid fa-users"></i> Guests Count</label>
+                            <input type="number" id="resGuests" required class="modern-input" placeholder="2" min="1" max="20" value="2" style="padding:14px; margin-top:6px;">
+                        </div>
+                        <div style="flex: 1; min-width: 220px;">
+                            <label style="font-size:0.9rem; color:rgba(255,255,255,0.7);"><i class="fa-solid fa-clock"></i> Date & Time</label>
+                            <input type="datetime-local" id="resTime" required class="modern-input" style="padding:14px; margin-top:6px;">
+                        </div>
                     </div>
-                    <button type="submit" class="btn-primary full-width mt-4" style="padding: 12px; font-size: 1rem;"><i
-                            class="fa-solid fa-calendar-plus" style="margin-right:8px;"></i> Request Booking</button>
+                    <div class="form-group" style="margin-top:15px;">
+                        <label style="font-size:0.9rem; color:rgba(255,255,255,0.7);"><i class="fa-solid fa-comment-dots"></i> Special Requests (Optional)</label>
+                        <input type="text" id="resRequests" class="modern-input" placeholder="e.g. Window table, birthday celebration..." style="padding:14px; margin-top:6px;">
+                    </div>
+                    <button type="submit" class="btn-spatial-primary full-width mt-4" style="padding: 16px; width: 100%; justify-content: center; margin-top: 25px;">
+                        <i class="fa-solid fa-calendar-plus"></i> Confirm Booking Request
+                    </button>
                 </form>
             </div>
         </section>
 
-        <!-- Feedback Section -->
-        <section id="feedback">
-            <h2 class="section-title gradient-text">Share Your Thoughts</h2>
-            <p class="section-subtitle">We value your experience. Help us improve.</p>
-            <div class="glass-panel form-section">
+        <!-- Customer Feedback Section -->
+        <section id="feedback" style="scroll-margin-top: 120px;">
+            <h2 class="section-title gradient-text">Customer Reviews</h2>
+            <p class="section-subtitle">We value your spatial cafe experience.</p>
+            <div class="spatial-card spatial-section-card" style="margin-bottom: 55px;">
                 <form id="customerFeedbackForm">
                     <div class="form-group">
-                        <label>Your Name (Optional)</label>
-                        <input type="text" id="fbName" class="modern-input" placeholder="Anonymous">
+                        <label style="font-size:0.9rem; color:rgba(255,255,255,0.7);"><i class="fa-solid fa-user-pen"></i> Your Name</label>
+                        <input type="text" id="fbName" class="modern-input" placeholder="e.g. Alex M. (or leave empty for Anonymous)" style="padding:14px; margin-top:6px;">
                     </div>
-                    <div class="form-group">
-                        <label>Rating (1-5)</label>
-                        <select id="fbRating" class="modern-select">
-                            <option value="5">⭐⭐⭐⭐⭐ 5 - Excellent</option>
+                    <div class="form-group" style="margin-top:15px;">
+                        <label style="font-size:0.9rem; color:rgba(255,255,255,0.7);"><i class="fa-solid fa-star"></i> Experience Rating</label>
+                        <select id="fbRating" class="modern-select" style="padding:14px; margin-top:6px;">
+                            <option value="5">⭐⭐⭐⭐⭐ 5 - Exceptional</option>
                             <option value="4">⭐⭐⭐⭐ 4 - Very Good</option>
-                            <option value="3">⭐⭐⭐ 3 - Average</option>
-                            <option value="2">⭐⭐ 2 - Poor</option>
-                            <option value="1">⭐ 1 - Terrible</option>
+                            <option value="3">⭐⭐⭐ 3 - Satisfactory</option>
+                            <option value="2">⭐⭐ 2 - Needs Improvement</option>
+                            <option value="1">⭐ 1 - Disappointing</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Message</label>
-                        <textarea id="fbMessage" rows="4" required class="modern-input"
-                            placeholder="Tell us about your visit..."></textarea>
+                    <div class="form-group" style="margin-top:15px;">
+                        <label style="font-size:0.9rem; color:rgba(255,255,255,0.7);"><i class="fa-solid fa-message"></i> Comments / Review</label>
+                        <textarea id="fbMessage" rows="4" required class="modern-input" placeholder="Tell us about the coffee, ambiance, or service..." style="padding:14px; margin-top:6px;"></textarea>
                     </div>
-                    <button type="submit" class="btn-primary full-width mt-4" style="padding: 12px; font-size: 1rem;"><i
-                            class="fa-solid fa-paper-plane" style="margin-right:8px;"></i> Submit Feedback</button>
+                    <button type="submit" class="btn-spatial-primary full-width mt-4" style="padding: 16px; width: 100%; justify-content: center; margin-top: 25px;">
+                        <i class="fa-solid fa-paper-plane"></i> Submit Review
+                    </button>
                 </form>
+            </div>
+
+            <!-- Recent Reviews Wall -->
+            <div id="feedbackWallContainer" style="margin-bottom: 90px;">
+                <h3 style="text-align: center; margin-bottom: 25px; color: var(--spatial-gold);">Recent Customer Words</h3>
+                <div class="feedback-grid" id="feedbackWall" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:22px;"></div>
             </div>
         </section>
     </div>
 
-    <!-- Floating Cart Button -->
+    <!-- Floating Spatial Cart Button -->
     <div class="floating-cart">
-        <button class="cart-btn" onclick="toggleCart()">
+        <button class="cart-btn" onclick="toggleCart()" title="View Order Cart">
             <i class="fa-solid fa-bag-shopping"></i>
             <div class="cart-badge" id="cartBadge">0</div>
         </button>
@@ -394,39 +1003,79 @@
 
     <!-- Cart Overlay & Sidebar -->
     <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
-    <div class="cart-sidebar glass-panel" id="cartSidebar">
+    <div class="cart-sidebar" id="cartSidebar">
         <div class="cart-header">
-            <h3>Your Order</h3>
-            <button class="icon-btn" onclick="toggleCart()"
-                style="background:none; border:none; color:white; cursor:pointer;"><i
-                    class="fa-solid fa-xmark"></i></button>
+            <h3><i class="fa-solid fa-cart-shopping" style="color: var(--spatial-gold); margin-right: 8px;"></i> Spatial Cart</h3>
+            <button onclick="toggleCart()" style="background:none; border:none; color:white; cursor:pointer; font-size: 1.4rem;">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
         </div>
         <div class="cart-body" id="cartItemsContainer">
-            <p style="text-align:center; color: var(--text-secondary); margin-top:50px;">Your cart is empty.</p>
+            <p style="text-align:center; color: rgba(255,255,255,0.5); margin-top:60px;">Your cart is empty.</p>
         </div>
         <div class="cart-footer">
-            <div class="form-group" style="margin-bottom: 15px;">
-                <label style="font-size: 0.9rem;">Your Name <span style="color:var(--danger)">*</span></label>
-                <input type="text" id="cartCustomerName" class="modern-input" placeholder="e.g. Alice" required
-                    style="font-size: 0.9rem; padding: 8px; margin-bottom: 10px;">
-                <label style="font-size: 0.9rem;">Order Notes (Optional)</label>
-                <input type="text" id="cartNotes" class="modern-input" placeholder="e.g. Pick up in 15 mins..."
-                    style="font-size: 0.9rem; padding: 8px;">
+            <div class="form-group" style="margin-bottom: 18px;">
+                <label style="font-size: 0.85rem; color: rgba(255,255,255,0.7);">Customer Name <span style="color:var(--danger)">*</span></label>
+                <input type="text" id="cartCustomerName" class="modern-input" placeholder="e.g. David Miller" required style="font-size: 0.92rem; padding: 12px; margin-bottom: 12px; margin-top:4px;">
+                
+                <label style="font-size: 0.85rem; color: rgba(255,255,255,0.7);">Special Preparation Notes</label>
+                <input type="text" id="cartNotes" class="modern-input" placeholder="e.g. Extra hot, oat milk..." style="font-size: 0.92rem; padding: 12px; margin-top:4px;">
             </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <span style="color: var(--text-secondary);">Total</span>
-                <span style="font-size: 1.5rem; font-weight: bold; color: var(--gold-primary);"
-                    id="cartTotal">₹0.00</span>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px;">
+                <span style="color: rgba(255,255,255,0.7); font-weight: 500;">Total Amount</span>
+                <span style="font-size: 1.7rem; font-weight: 800; color: var(--spatial-gold);" id="cartTotal">₹0.00</span>
             </div>
-            <button class="btn-primary full-width" onclick="checkout()" id="checkoutBtn"
-                style="padding: 15px; font-size: 1.1rem; border-radius: 30px;">Submit Order</button>
+            <button class="btn-spatial-primary full-width" onclick="checkout()" id="checkoutBtn" style="padding: 16px; width:100%; justify-content:center;">
+                <i class="fa-solid fa-check-circle"></i> Place Order Now
+            </button>
         </div>
     </div>
 
+    <!-- Order Receipt Modal -->
+    <div class="modal-overlay" id="orderModal">
+        <div class="modal-card">
+            <div style="text-align: center; margin-bottom: 25px;">
+                <div style="width: 65px; height: 65px; border-radius: 50%; background: rgba(46, 204, 113, 0.18); color: #2ecc71; display: inline-flex; align-items: center; justify-content: center; font-size: 2.2rem; margin-bottom: 15px; box-shadow: 0 0 25px rgba(46,204,113,0.4);">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <h2 style="font-size: 1.75rem; margin-bottom: 6px; font-weight:800;">Order Confirmed!</h2>
+                <p style="color: rgba(255,255,255,0.7); font-size: 0.98rem;">Our baristas are crafting your order in real-time.</p>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.04); border-radius: 18px; padding: 22px; margin-bottom: 25px; border: 1px dashed rgba(255,255,255,0.2);">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                    <span style="color: rgba(255,255,255,0.6);">Order Number:</span>
+                    <strong style="color: var(--spatial-gold); font-size: 1.3rem;" id="modalOrderId">#101</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                    <span style="color: rgba(255,255,255,0.6);">Customer:</span>
+                    <span id="modalCustomerName" style="color: white; font-weight: 600;">-</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                    <span style="color: rgba(255,255,255,0.6);">Items:</span>
+                    <span id="modalOrderItems" style="color: white; text-align: right; max-width: 250px; font-size: 0.92rem;">-</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <span style="color: rgba(255,255,255,0.6);">Total Paid:</span>
+                    <strong style="color: white; font-size: 1.15rem;" id="modalOrderTotal">₹0.00</strong>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 14px;">
+                <button class="btn-spatial-primary full-width" onclick="closeOrderModalAndTrack()" style="padding: 14px; font-size: 0.98rem; flex:1; justify-content:center;">
+                    <i class="fa-solid fa-route"></i> Track Live Status
+                </button>
+                <button class="btn-spatial-secondary" onclick="closeOrderModal()" style="padding: 14px 24px; font-size: 0.98rem;">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
     <footer>
-        <div class="container"
-            style="text-align: center; padding: 40px 0; color: var(--text-secondary); border-top: 1px solid rgba(255,255,255,0.05); margin-top: 40px;">
-            <p>&copy; 2026 BrewCafe System. Powered by Agentic Intelligence.</p>
+        <div class="container" style="text-align: center; padding: 40px 0; color: rgba(255,255,255,0.5); border-top: 1px solid rgba(255,255,255,0.06); margin-top: 70px;">
+            <p>&copy; 2026 BrewCafe Spatial Portal. Crafting perfection in virtual space.</p>
         </div>
     </footer>
 

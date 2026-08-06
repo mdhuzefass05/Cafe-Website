@@ -70,6 +70,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="#" class="nav-link" data-target="reservations">
+                        <i class="fa-solid fa-calendar-check nav-icon"></i>
+                        <span class="nav-text">Bookings</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="#" class="nav-link" id="exportBtn">
                         <i class="fa-solid fa-file-csv nav-icon"></i>
                         <span class="nav-text">Export CSV</span>
@@ -78,7 +84,50 @@
             </ul>
         </aside>
 
-        <!-- Main Content Area -->
+        <!-- Create/Edit Reservation Modal -->
+        <div id="reservationModal" class="modal-overlay">
+            <div class="modal-content glass-panel bounce-in" style="width: 500px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 id="reservationFormTitle">Edit Reservation</h2>
+                    <button class="icon-btn close-modal" onclick="closeReservationModal()"><i
+                            class="fa-solid fa-xmark"></i></button>
+                </div>
+                <form id="reservationForm">
+                    <input type="hidden" id="reservationId">
+                    <div class="form-group" style="display: flex; gap: 15px;">
+                        <div style="flex: 1;">
+                            <label>Customer Name</label>
+                            <input type="text" id="reservationName" class="modern-input" required>
+                        </div>
+                        <div style="flex: 1;">
+                            <label>Contact Info</label>
+                            <input type="text" id="reservationContact" class="modern-input">
+                        </div>
+                    </div>
+                    <div class="form-group" style="display: flex; gap: 15px;">
+                        <div style="flex: 1;">
+                            <label>Guests</label>
+                            <input type="number" id="reservationGuests" class="modern-input" required>
+                        </div>
+                        <div style="flex: 1;">
+                            <label>Table Assigned</label>
+                            <input type="number" id="reservationTable" class="modern-input" placeholder="Pending...">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Date & Time</label>
+                        <input type="datetime-local" id="reservationTime" class="modern-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Special Requests</label>
+                        <input type="text" id="reservationRequests" class="modern-input">
+                    </div>
+                    <button type="submit" class="btn-primary full-width mt-4" style="padding: 15px;">Save Booking</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Receipt Print Container (Hidden default) -->
         <main class="main-content">
 
             <!-- Dashboard View -->
@@ -309,6 +358,36 @@
                     </div>
                 </div>
             </section> <!-- End Inventory View -->
+
+            <!-- Reservations View -->
+            <section id="view-reservations" class="view-section" style="display: none;">
+                <div class="welcome-section fade-in">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h1>Table <span class="gradient-text">Bookings</span></h1>
+                    </div>
+                </div>
+
+                <div class="glass-panel fade-in stagger-1" style="padding: 24px;">
+                    <div class="table-container">
+                        <table class="modern-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Customer</th>
+                                    <th>Contact</th>
+                                    <th>Guests / Table</th>
+                                    <th>Date & Time</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reservationsTableBody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section> <!-- End Reservations View -->
         </main>
     </div>
 

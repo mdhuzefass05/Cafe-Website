@@ -54,7 +54,13 @@ function initializeDatabase() {
                 reservation_time DATETIME,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )
-        `);
+        `, (err) => {
+            if (!err) {
+                db.run(`ALTER TABLE reservations ADD COLUMN status TEXT CHECK(status IN ('pending', 'confirmed', 'cancelled')) DEFAULT 'pending'`, (e) => {});
+                db.run(`ALTER TABLE reservations ADD COLUMN contact_info TEXT`, (e) => {});
+                db.run(`ALTER TABLE reservations ADD COLUMN special_requests TEXT`, (e) => {});
+            }
+        });
 
         // Feedback Table
         db.run(`

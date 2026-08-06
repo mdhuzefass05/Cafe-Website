@@ -15,7 +15,7 @@ db.serialize(() => {
             INSERT INTO orders (items, total_price, status, created_at)
             VALUES (
                 'Dummy Item ' || ?, 
-                ROUND(RANDOM() / 1000000000000000.0 * 20 + 10, 2), 
+                ROUND(RANDOM() / 1000000000000000.0 * 500 + 200, 2), 
                 CASE ROUND(RANDOM() / 1000000000000000.0 * 2) WHEN 0 THEN 'pending' WHEN 1 THEN 'completed' ELSE 'cancelled' END,
                 datetime('now', 'localtime', ?)
             )
@@ -34,11 +34,11 @@ db.serialize(() => {
 
     // Insert dummy menu items
     const menuItems = [
-        { name: 'Vanilla Latte', cat: 'Coffee', price: 4.50 },
-        { name: 'Cold Brew', cat: 'Coffee', price: 3.75 },
-        { name: 'Matcha Green Tea', cat: 'Tea', price: 4.00 },
-        { name: 'Blueberry Muffin', cat: 'Pastry', price: 2.50 },
-        { name: 'Chocolate Croissant', cat: 'Pastry', price: 3.00 }
+        { name: 'Vanilla Latte', cat: 'Coffee', price: 250.00 },
+        { name: 'Cold Brew', cat: 'Coffee', price: 220.00 },
+        { name: 'Matcha Green Tea', cat: 'Tea', price: 200.00 },
+        { name: 'Blueberry Muffin', cat: 'Pastry', price: 150.00 },
+        { name: 'Chocolate Croissant', cat: 'Pastry', price: 180.00 }
     ];
     menuItems.forEach(item => {
         db.run('INSERT INTO menu_items (name, category, price, is_available) VALUES (?, ?, ?, 1)', [item.name, item.cat, item.price]);

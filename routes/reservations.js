@@ -30,6 +30,19 @@ router.put('/:id', requireAuth, async (req, res) => {
     }
 });
 
+router.put('/:id/status', requireAuth, async (req, res) => {
+    try {
+        const { status } = req.body;
+        if (!['pending', 'confirmed', 'cancelled'].includes(status)) {
+            return res.status(400).json({ error: 'Invalid status' });
+        }
+        const updated = await Reservation.update(req.params.id, { status });
+        res.json(updated);
+    } catch (error) {
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
 router.delete('/:id', requireAuth, async (req, res) => {
     try {
         await Reservation.delete(req.params.id);

@@ -118,6 +118,7 @@ if (document.getElementById('logoutBtn')) {
             if (targetId === 'orders') fetchOrders();
             if (targetId === 'menu') fetchMenu();
             if (targetId === 'inventory') fetchInventory();
+            if (targetId === 'reservations') fetchReservations();
         });
     });
 
@@ -807,4 +808,113 @@ if (document.getElementById('logoutBtn')) {
             } catch (err) { console.error(err); }
         }
     };
+
+    // --- RESERVATIONS LOGIC ---
+    async function fetchReservations() {
+        try {
+            const res = await fetch(`${API_BASE}/reservations`);
+            const data = await res.json();
+            const tbody = document.getElementById('reservationsTableBody');
+            tbody.innerHTML = '';
+
+            if (data && data.length > 0) {
+                data.forEach(resv => {
+                    const statusClass = `badge-${resv.status}`;
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>#${resv.id}</td>
+                        <td>${resv.customer_name}</td>
+                        <td>${resv.contact_info || '-'}</td>
+                        <td>${resv.guests} Guests / Tbl ${resv.table_number || '?'}</td>
+                        <td>${new Date(resv.reservation_time).toLocaleString()}</td>
+                        <td>
+                            <select class="modern-select badge-status ${statusClass}" style="padding: 4px 10px; font-size: 0.8rem; border-color: transparent;" onchange="updateReservationStatus(${resv.id}, this, this.value)">
+                                <option value="pending" style="background: var(--bg-secondary); color: var(--text-primary);" ${resv.status === 'pending' ? 'selected' : ''}>Pending</option>
+                                <option value="confirmed" style="background: var(--bg-secondary); color: var(--text-primary);" ${resv.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+                                <option value="cancelled" style="background: var(--bg-secondary); color: var(--text-primary);" ${resv.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button class="action-btn" onclick="editReservation(${resv.id}, '${resv.customer_name.replace(/'/g, "\\'")}', '${(resv.contact_info || '').replace(/'/g, "\\'")}', ${resv.guests}, ${resv.table_number || 'null'}, '${resv.reservation_time}', '${(resv.special_requests || '').replace(/'/g, "\\'")}')" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                            <button class="action-btn" onclick="deleteReservation(${resv.id})" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } else {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">No bookings found.</td></tr>`;
+            }
+        } catch (error) { console.error('Error fetching reservations:', error); }
+    }
+    
+    window.fetchReservations = fetchReservations;
+
+    window.updateReservationStatus = async (id, selectElement, newStatus) => {
+        try {
+            const res = await fetch(`${API_BASE}/reservations/${id}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus })
+            });
+            if (res.ok) {
+                selectElement.className = `modern-select badge-status badge-${newStatus}`;
+                fetchDashboardData();
+            } else { alert("Failed to change status"); }
+        } catch (err) { console.error(err); }
+    };
+
+    window.deleteReservation = async (id) => {
+        if (confirm('Delete this reservation completely?')) {
+            try {
+                const res = await fetch(`${API_BASE}/reservations/${id}`, { method: 'DELETE' });
+                if (res.ok) fetchReservations();
+            } catch (err) { console.error(err); }
+        }
+    };
+
+    window.editReservation = (id, name, contact, guests, table, time, req) => {
+        document.getElementById('reservationId').value = id;
+        document.getElementById('reservationName').value = name;
+        document.getElementById('reservationContact').value = contact || '';
+        document.getElementById('reservationGuests').value = guests;
+        document.getElementById('reservationTable').value = table || '';
+        
+        // Handle datetime-local formatting from potentially incomplete DB formats
+        let timeStr = time;
+        if (timeStr && !timeStr.includes('T')) timeStr = timeStr.replace(' ', 'T');
+        document.getElementById('reservationTime').value = timeStr;
+        
+        document.getElementById('reservationRequests').value = req || '';
+        
+        document.getElementById('reservationModal').classList.add('active');
+    };
+
+    window.closeReservationModal = () => {
+        document.getElementById('reservationModal').classList.remove('active');
+    };
+
+    document.getElementById('reservationForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('reservationId').value;
+        const payload = {
+            customer_name: document.getElementById('reservationName').value,
+            contact_info: document.getElementById('reservationContact').value,
+            guests: parseInt(document.getElementById('reservationGuests').value, 10),
+            table_number: parseInt(document.getElementById('reservationTable').value, 10) || null,
+            reservation_time: document.getElementById('reservationTime').value,
+            special_requests: document.getElementById('reservationRequests').value
+        };
+
+        try {
+            const res = await fetch(`${API_BASE}/reservations/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                closeReservationModal();
+                fetchReservations();
+            } else { alert("Failed to save reservation details"); }
+        } catch (err) { console.error(err); }
+    });
 }
