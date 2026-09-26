@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Premium Multi-Stop Cafe Gold Gradient -->
+    <linearGradient id="goldGrad" x1="15%" y1="0%" x2="85%" y2="100%">
+      <stop offset="0%" stop-color="#FFF3A8"/>
+      <stop offset="25%" stop-color="#FFD700"/>
+      <stop offset="65%" stop-color="#D4AF37"/>
+      <stop offset="100%" stop-color="#A67C1E"/>
+    </linearGradient>
+
+    <!-- Deep Luxury Espresso Obsidian Gradient -->
+    <linearGradient id="badgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1F1D1A"/>
+      <stop offset="45%" stop-color="#141311"/>
+      <stop offset="100%" stop-color="#080808"/>
+    </linearGradient>
+
+    <!-- Ambient Glow Behind Mug -->
+    <radialGradient id="goldAmbient" cx="50%" cy="54%" r="46%">
+      <stop offset="0%" stop-color="#FFD700" stop-opacity="0.28"/>
+      <stop offset="60%" stop-color="#D4AF37" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#D4AF37" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Soft Shadow and Gold Glow Filter -->
+    <filter id="iconFilter" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="8" flood-color="#000000" flood-opacity="0.55"/>
+      <feDropShadow dx="0" dy="1" stdDeviation="12" flood-color="#FFD700" flood-opacity="0.32"/>
+    </filter>
+  </defs>
+
+  <!-- Circular Luxury Badge -->
+  <circle cx="256" cy="256" r="236" fill="url(#badgeGrad)" stroke="url(#goldGrad)" stroke-width="16" />
+  <circle cx="256" cy="256" r="226" fill="url(#goldAmbient)" />
+
+  <!-- Exact FontAwesome 6 Hot Mug & Steam Vector -->
+  <g transform="translate(90, 98) scale(0.63)" filter="url(#iconFilter)">
+    <path fill="url(#goldGrad)" d="M88 0C74.7 0 64 10.7 64 24c0 38.9 23.4 59.4 39.1 73.1l1.1 1C120.5 112.3 128 119.9 128 136c0 13.3 10.7 24 24 24s24-10.7 24-24c0-38.9-23.4-59.4-39.1-73.1l-1.1-1C119.5 47.7 112 40.1 112 24c0-13.3-10.7-24-24-24zM32 192c-17.7 0-32 14.3-32 32L0 416c0 53 43 96 96 96l192 0c53 0 96-43 96-96l16 0c61.9 0 112-50.1 112-112s-50.1-112-112-112l-48 0L32 192zm352 64l16 0c26.5 0 48 21.5 48 48s-21.5 48-48 48l-16 0 0-96zM224 24c0-13.3-10.7-24-24-24s-24 10.7-24 24c0 38.9 23.4 59.4 39.1 73.1l1.1 1C232.5 112.3 240 119.9 240 136c0 13.3 10.7 24 24 24s24-10.7 24-24c0-38.9-23.4-59.4-39.1-73.1l-1.1-1C231.5 47.7 224 40.1 224 24z"/>
+  </g>
+</svg>
