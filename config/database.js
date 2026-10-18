@@ -83,7 +83,25 @@ function initializeDatabase() {
                 is_available BOOLEAN DEFAULT 1,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )
-        `);
+        `, (err) => {
+            if (!err) {
+                db.get('SELECT COUNT(*) as count FROM menu_items', [], (err, row) => {
+                    if (!err && row && row.count === 0) {
+                        const menuItems = [
+                            { name: 'Vanilla Latte', cat: 'Coffee', price: 250.00 },
+                            { name: 'Cold Brew', cat: 'Coffee', price: 220.00 },
+                            { name: 'Matcha Green Tea', cat: 'Tea', price: 200.00 },
+                            { name: 'Blueberry Muffin', cat: 'Pastry', price: 150.00 },
+                            { name: 'Chocolate Croissant', cat: 'Pastry', price: 180.00 }
+                        ];
+                        const stmt = db.prepare('INSERT INTO menu_items (name, category, price, is_available) VALUES (?, ?, ?, 1)');
+                        menuItems.forEach(item => stmt.run(item.name, item.cat, item.price));
+                        stmt.finalize();
+                        console.log('Seeded initial menu items.');
+                    }
+                });
+            }
+        });
 
         // Inventory Table
         db.run(`
@@ -95,7 +113,25 @@ function initializeDatabase() {
                 low_stock_threshold REAL NOT NULL,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )
-        `);
+        `, (err) => {
+            if (!err) {
+                db.get('SELECT COUNT(*) as count FROM inventory', [], (err, row) => {
+                    if (!err && row && row.count === 0) {
+                        const invItems = [
+                            { name: 'Espresso Beans', qty: 15.5, unit: 'lbs', thresh: 5.0 },
+                            { name: 'Whole Milk', qty: 3.0, unit: 'Gallons', thresh: 4.0 },
+                            { name: 'Oat Milk', qty: 10.0, unit: 'Cartons', thresh: 2.0 },
+                            { name: 'Vanilla Syrup', qty: 5.0, unit: 'Bottles', thresh: 1.5 },
+                            { name: 'Pastry Flour', qty: 20.0, unit: 'lbs', thresh: 10.0 }
+                        ];
+                        const stmt = db.prepare('INSERT INTO inventory (item_name, quantity, unit, low_stock_threshold) VALUES (?, ?, ?, ?)');
+                        invItems.forEach(item => stmt.run(item.name, item.qty, item.unit, item.thresh));
+                        stmt.finalize();
+                        console.log('Seeded initial inventory items.');
+                    }
+                });
+            }
+        });
 
         // Menu Ingredients Linking Table
         db.run(`
