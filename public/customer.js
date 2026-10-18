@@ -67,8 +67,43 @@ const cartNotesInput = document.getElementById('cartNotes');
 const toastContainer = document.getElementById('toastContainer');
 const orderModal = document.getElementById('orderModal');
 
+// --- THEME TOGGLE (Dark / Luxury Light) ---
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    applyTheme(savedTheme, false);
+}
+
+function applyTheme(theme, showNotice = false) {
+    const icon = document.getElementById('themeToggleIcon');
+    if (theme === 'light') {
+        document.body.classList.add('light-theme');
+        if (icon) {
+            icon.className = 'fa-solid fa-moon';
+        }
+    } else {
+        document.body.classList.remove('light-theme');
+        if (icon) {
+            icon.className = 'fa-solid fa-sun';
+        }
+    }
+    if (showNotice) {
+        showToast(theme === 'light' ? '☀️ Switched to White Luxury Theme' : '🌙 Switched to Dark Spatial Theme', theme === 'light' ? 'fa-sun' : 'fa-moon');
+    }
+}
+
+window.toggleTheme = function() {
+    const isLight = document.body.classList.contains('light-theme');
+    const newTheme = isLight ? 'dark' : 'light';
+    localStorage.setItem('theme', newTheme);
+    applyTheme(newTheme, true);
+};
+
+// Immediate check on script load
+initTheme();
+
 // --- INITIALIZE ---
 document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
     fetchMenu();
     setupFiltersAndSearch();
     setupForms();
@@ -401,18 +436,18 @@ window.selectEmojiRating = (rating, element) => {
 
 // --- RECENT ORDERS & ORDER TRACKER ---
 function saveRecentOrder(id, name, total) {
-    let recent = JSON.parse(localStorage.getItem('brewcafe_recent_orders') || '[]');
+    let recent = JSON.parse(localStorage.getItem('storywithsip_recent_orders') || localStorage.getItem('brewcafe_recent_orders') || '[]');
     recent = recent.filter(o => o.id !== id);
     recent.unshift({ id, name, total, date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
     if (recent.length > 5) recent.pop();
-    localStorage.setItem('brewcafe_recent_orders', JSON.stringify(recent));
+    localStorage.setItem('storywithsip_recent_orders', JSON.stringify(recent));
     renderRecentOrders();
 }
 
 function renderRecentOrders() {
     const recentContainer = document.getElementById('recentOrdersContainer');
     const recentList = document.getElementById('recentOrdersList');
-    let recent = JSON.parse(localStorage.getItem('brewcafe_recent_orders') || '[]');
+    let recent = JSON.parse(localStorage.getItem('storywithsip_recent_orders') || localStorage.getItem('brewcafe_recent_orders') || '[]');
 
     if (recent.length === 0) {
         recentContainer.style.display = 'none';
@@ -692,18 +727,54 @@ let libSearchText = '';
 let bookRequestTarget = null;
 
 const BOOK_GENRE_COLORS = {
-    'Fiction':     { bg: 'rgba(155,89,182,0.18)', border: 'rgba(155,89,182,0.45)', text: '#c39bd3' },
-    'Non-Fiction': { bg: 'rgba(52,152,219,0.18)', border: 'rgba(52,152,219,0.45)', text: '#7fb3d3' },
-    'Mystery':     { bg: 'rgba(231,76,60,0.18)',  border: 'rgba(231,76,60,0.45)',  text: '#e59f98' },
-    'Science':     { bg: 'rgba(46,204,113,0.18)', border: 'rgba(46,204,113,0.45)', text: '#82e0aa' },
-    'History':     { bg: 'rgba(230,126,34,0.18)', border: 'rgba(230,126,34,0.45)', text: '#f0b27a' },
-    'Philosophy':  { bg: 'rgba(26,188,156,0.18)', border: 'rgba(26,188,156,0.45)', text: '#76d7c4' },
-    'Biography':   { bg: 'rgba(241,196,15,0.18)', border: 'rgba(241,196,15,0.45)', text: '#f9e79f' },
-    'default':     { bg: 'rgba(226,183,68,0.12)', border: 'rgba(226,183,68,0.35)', text: '#e2b744' },
+    'Fiction':         { bg: 'rgba(155,89,182,0.18)', border: 'rgba(155,89,182,0.45)', text: '#c39bd3' },
+    'Non-Fiction':     { bg: 'rgba(52,152,219,0.18)', border: 'rgba(52,152,219,0.45)', text: '#7fb3d3' },
+    'Mystery':         { bg: 'rgba(231,76,60,0.18)',  border: 'rgba(231,76,60,0.45)',  text: '#e59f98' },
+    'Science':         { bg: 'rgba(46,204,113,0.18)', border: 'rgba(46,204,113,0.45)', text: '#82e0aa' },
+    'History':         { bg: 'rgba(230,126,34,0.18)', border: 'rgba(230,126,34,0.45)', text: '#f0b27a' },
+    'Philosophy':      { bg: 'rgba(26,188,156,0.18)', border: 'rgba(26,188,156,0.45)', text: '#76d7c4' },
+    'Personal Growth': { bg: 'rgba(241,196,15,0.18)', border: 'rgba(241,196,15,0.45)', text: '#f9e79f' },
+    'Cozy Reads':      { bg: 'rgba(230,126,34,0.18)', border: 'rgba(230,126,34,0.45)', text: '#f5b041' },
+    'Art & Design':    { bg: 'rgba(52,152,219,0.18)', border: 'rgba(52,152,219,0.45)', text: '#85c1e9' },
+    'Coffee Lore':     { bg: 'rgba(226,183,68,0.18)', border: 'rgba(226,183,68,0.45)', text: '#e2b744' },
+    'default':         { bg: 'rgba(226,183,68,0.12)', border: 'rgba(226,183,68,0.35)', text: '#e2b744' },
+};
+
+const defaultBookCovers = {
+    'world atlas of coffee': 'https://covers.openlibrary.org/b/isbn/9781784724290-M.jpg',
+    'kafka on the shore': 'https://covers.openlibrary.org/b/isbn/9781400079278-M.jpg',
+    'before the coffee gets cold': 'https://covers.openlibrary.org/b/isbn/9781335430991-M.jpg',
+    'meditations': 'https://covers.openlibrary.org/b/isbn/9780140449334-M.jpg',
+    'atomic habits': 'https://covers.openlibrary.org/b/isbn/9780735211292-M.jpg',
+    'everyday things': 'https://covers.openlibrary.org/b/isbn/9780465050659-M.jpg',
+    'default': 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80'
 };
 
 function getGenreStyle(genre) {
     return BOOK_GENRE_COLORS[genre] || BOOK_GENRE_COLORS['default'];
+}
+
+function getBookCopiesAvailable(book) {
+    if (typeof book.copies_available === 'number') return book.copies_available;
+    if (typeof book.available_copies === 'number') return book.available_copies;
+    if (typeof book.copies_available === 'string') return parseInt(book.copies_available, 10) || 0;
+    return 0;
+}
+
+function getBookCopiesTotal(book) {
+    if (typeof book.copies_total === 'number') return book.copies_total;
+    if (typeof book.total_copies === 'number') return book.total_copies;
+    if (typeof book.copies_total === 'string') return parseInt(book.copies_total, 10) || 1;
+    return 1;
+}
+
+function getBookCover(book) {
+    if (book.cover_image && book.cover_image.trim()) return book.cover_image;
+    const titleLower = (book.title || '').toLowerCase();
+    for (const [key, url] of Object.entries(defaultBookCovers)) {
+        if (titleLower.includes(key)) return url;
+    }
+    return defaultBookCovers['default'];
 }
 
 async function fetchLibraryBooks() {
@@ -724,7 +795,7 @@ async function fetchLibraryBooks() {
 
 function renderLibraryUI() {
     const books = allLibBooks;
-    const available = books.filter(b => b.available_copies > 0).length;
+    const available = books.filter(b => getBookCopiesAvailable(b) > 0).length;
     const genres = [...new Set(books.map(b => b.genre).filter(Boolean))];
 
     const elTotal = document.getElementById('libTotalBooks');
@@ -762,6 +833,7 @@ function renderLibraryGrid() {
             (b.title || '').toLowerCase().includes(query) ||
             (b.author || '').toLowerCase().includes(query) ||
             (b.genre || '').toLowerCase().includes(query) ||
+            (b.shelf_location || '').toLowerCase().includes(query) ||
             (b.description || '').toLowerCase().includes(query);
         return matchesGenre && matchesSearch;
     });
@@ -782,57 +854,113 @@ function renderLibraryGrid() {
 
 function createBookCard(book, index) {
     const style = getGenreStyle(book.genre);
-    const isAvail = book.available_copies > 0;
+    const copiesAvail = getBookCopiesAvailable(book);
+    const copiesTotal = getBookCopiesTotal(book);
+    const isAvail = copiesAvail > 0;
+    const coverUrl = getBookCover(book);
+
     const card = document.createElement('div');
     card.className = 'spatial-card fade-in';
     card.style.cssText = `
         padding: 0; overflow: hidden;
+        display: flex; flex-direction: column;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
         animation-delay: ${index * 0.05}s;
         border: 1px solid ${isAvail ? style.border : 'rgba(255,255,255,0.08)'};
+        background: rgba(22, 22, 34, 0.65);
     `;
     card.onmouseenter = () => {
         card.style.transform = 'translateY(-6px) scale(1.02)';
-        card.style.boxShadow = `0 20px 50px rgba(0,0,0,0.6), 0 0 20px ${style.border}`;
+        card.style.boxShadow = `0 20px 50px rgba(0,0,0,0.6), 0 0 24px ${style.border}`;
     };
     card.onmouseleave = () => { card.style.transform = ''; card.style.boxShadow = ''; };
 
+    // Top spine accent
     const spine = document.createElement('div');
-    spine.style.cssText = `height:6px; background:linear-gradient(90deg,${style.border},${style.bg}); width:100%;`;
+    spine.style.cssText = `height:5px; background:linear-gradient(90deg,${style.border},${style.bg}); width:100%;`;
     card.appendChild(spine);
 
+    // Book Cover Image Container
+    const coverContainer = document.createElement('div');
+    coverContainer.style.cssText = `
+        position: relative;
+        width: 100%;
+        height: 220px;
+        background: radial-gradient(circle at center, rgba(35, 35, 55, 0.9), rgba(12, 12, 20, 0.95));
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid rgba(255,255,255,0.07);
+    `;
+
+    coverContainer.innerHTML = `
+        <div style="position:absolute; inset:0; opacity:0.25; background:url('${coverUrl}') center/cover filter blur(14px);"></div>
+        <img src="${coverUrl}" alt="${book.title}" 
+            onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80';"
+            style="position:relative; z-index:2; height:185px; max-width:140px; object-fit:cover; border-radius:8px; box-shadow: -5px 6px 18px rgba(0,0,0,0.7), 0 0 2px rgba(255,255,255,0.3); border-left: 2px solid rgba(255,255,255,0.25); transition:transform 0.35s ease;">
+        <div style="position:absolute; top:12px; left:12px; z-index:3; background:${style.bg}; border:1px solid ${style.border}; color:${style.text}; font-size:0.72rem; font-weight:700; padding:4px 10px; border-radius:20px; backdrop-filter:blur(8px);">
+            ${book.genre || 'General'}
+        </div>
+        <div style="position:absolute; top:12px; right:12px; z-index:3; font-size:0.75rem; font-weight:700; padding:4px 10px; border-radius:20px; backdrop-filter:blur(8px); ${isAvail
+            ? 'background:rgba(46,204,113,0.22); color:#2ecc71; border:1px solid rgba(46,204,113,0.4); box-shadow:0 0 12px rgba(46,204,113,0.3);'
+            : 'background:rgba(231,76,60,0.22); color:#e74c3c; border:1px solid rgba(231,76,60,0.4);'}">
+            ${isAvail ? `✓ ${copiesAvail} Available` : '✕ Checked Out'}
+        </div>
+    `;
+
+    // Scale cover image on card hover
+    card.addEventListener('mouseenter', () => {
+        const img = coverContainer.querySelector('img');
+        if (img) img.style.transform = 'scale(1.06) rotate(-1deg)';
+    });
+    card.addEventListener('mouseleave', () => {
+        const img = coverContainer.querySelector('img');
+        if (img) img.style.transform = 'scale(1) rotate(0deg)';
+    });
+
+    card.appendChild(coverContainer);
+
+    // Card Body
     const body = document.createElement('div');
-    body.style.padding = '22px';
+    body.style.cssText = 'padding:20px; display:flex; flex-direction:column; flex:1; justify-content:space-between;';
     body.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
-            <div style="background:${style.bg}; border:1px solid ${style.border}; color:${style.text}; font-size:0.72rem; font-weight:700; padding:4px 10px; border-radius:20px;">
-                ${book.genre || 'General'}
+        <div>
+            <h3 style="font-size:1.05rem; font-weight:800; color:#fff; margin:0 0 6px; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
+                ${book.title}
+            </h3>
+            <div style="font-size:0.82rem; color:rgba(255,255,255,0.6); margin-bottom:10px;">
+                <i class="fa-solid fa-feather-pointed" style="color:${style.text}; margin-right:4px;"></i>${book.author}
             </div>
-            <div style="font-size:0.78rem; font-weight:700; padding:4px 10px; border-radius:20px; ${isAvail
-                ? `background:rgba(46,204,113,0.15); color:#2ecc71; border:1px solid rgba(46,204,113,0.3);`
-                : `background:rgba(231,76,60,0.12); color:#e74c3c; border:1px solid rgba(231,76,60,0.25);`}">
-                ${isAvail ? `&#10003; ${book.available_copies} Available` : '&#10005; Checked Out'}
+            ${book.shelf_location ? `
+                <div style="font-size:0.75rem; color:var(--spatial-gold); margin-bottom:10px; display:flex; align-items:center; gap:5px;">
+                    <i class="fa-solid fa-location-dot"></i> ${book.shelf_location}
+                </div>
+            ` : ''}
+            ${book.description ? `
+                <p style="font-size:0.82rem; color:rgba(255,255,255,0.55); line-height:1.5; margin-bottom:14px; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">
+                    ${book.description}
+                </p>
+            ` : ''}
+            ${book.paired_menu_item_name ? `
+                <div style="font-size:0.74rem; background:rgba(226,183,68,0.08); border:1px dashed rgba(226,183,68,0.3); border-radius:8px; padding:6px 10px; margin-bottom:14px; color:rgba(255,255,255,0.8);">
+                    ☕ <span style="color:var(--spatial-gold); font-weight:600;">Perfect Pair:</span> ${book.paired_menu_item_name}
+                </div>
+            ` : ''}
+        </div>
+        <div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:14px; font-size:0.76rem; color:rgba(255,255,255,0.45);">
+                <span><i class="fa-solid fa-copy"></i> ${copiesTotal} total copies</span>
+                <span><i class="fa-solid fa-book-bookmark"></i> In-Cafe Read</span>
             </div>
+            <button onclick="openBookRequestModal(${book.id})" ${!isAvail ? 'disabled' : ''}
+                style="width:100%; padding:12px 0; border-radius:14px; font-size:0.9rem; font-weight:700; font-family:inherit; transition:all 0.25s; border:none; letter-spacing:0.02em; display:flex; align-items:center; justify-content:center; gap:8px;
+                    ${isAvail
+                        ? `background:linear-gradient(135deg, ${style.border}, rgba(226,183,68,0.7)); color:#fff; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,0.35);`
+                        : `background:rgba(255,255,255,0.06); color:rgba(255,255,255,0.3); cursor:not-allowed;`}">
+                ${isAvail ? '<i class="fa-solid fa-hand-holding-heart"></i> Request to Table' : '<i class="fa-solid fa-clock"></i> Currently Unavailable'}
+            </button>
         </div>
-        <div style="font-size:2.2rem; margin-bottom:10px;">&#128218;</div>
-        <h3 style="font-size:1.08rem; font-weight:800; color:#fff; margin:0 0 6px; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
-            ${book.title}
-        </h3>
-        <div style="font-size:0.82rem; color:rgba(255,255,255,0.55); margin-bottom:12px;">
-            <i class="fa-solid fa-feather-pointed" style="color:${style.text}; margin-right:4px;"></i>${book.author}
-        </div>
-        ${book.description ? `<p style="font-size:0.83rem; color:rgba(255,255,255,0.55); line-height:1.55; margin-bottom:16px; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">${book.description}</p>` : ''}
-        <div style="display:flex; gap:10px; margin-bottom:16px; font-size:0.78rem; color:rgba(255,255,255,0.4); flex-wrap:wrap;">
-            ${book.total_copies ? `<span><i class="fa-solid fa-copy"></i> ${book.total_copies} copies</span>` : ''}
-            ${book.isbn ? `<span><i class="fa-solid fa-barcode"></i> ${book.isbn}</span>` : ''}
-        </div>
-        <button onclick="openBookRequestModal(${book.id})" ${!isAvail ? 'disabled' : ''}
-            style="width:100%; padding:11px 0; border-radius:14px; font-size:0.9rem; font-weight:700; font-family:inherit; transition:all 0.25s; border:none; letter-spacing:0.02em;
-                ${isAvail
-                    ? `background:linear-gradient(135deg,${style.border},rgba(226,183,68,0.6)); color:#fff; cursor:pointer;`
-                    : `background:rgba(255,255,255,0.06); color:rgba(255,255,255,0.3); cursor:not-allowed;`}">
-            ${isAvail ? '<i class="fa-solid fa-hand-holding-heart"></i> Request to Table' : '<i class="fa-solid fa-clock"></i> Unavailable'}
-        </button>
     `;
     card.appendChild(body);
     return card;
@@ -852,19 +980,25 @@ function filterLibrarySearch(query) {
 
 function openBookRequestModal(bookId) {
     const book = allLibBooks.find(b => b.id === bookId);
-    if (!book || book.available_copies < 1) return;
+    if (!book || getBookCopiesAvailable(book) < 1) return;
     bookRequestTarget = book;
     const style = getGenreStyle(book.genre);
+    const coverUrl = getBookCover(book);
 
     document.getElementById('bookRequestBookInfo').innerHTML = `
-        <div style="display:flex; gap:14px; align-items:center;">
-            <div style="font-size:2.5rem;">&#128218;</div>
+        <div style="display:flex; gap:16px; align-items:center;">
+            <img src="${coverUrl}" alt="${book.title}" 
+                onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80';"
+                style="width:58px; height:80px; object-fit:cover; border-radius:6px; box-shadow: 0 4px 12px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2);">
             <div>
-                <div style="font-weight:800; font-size:1.05rem; color:#fff; margin-bottom:4px;">${book.title}</div>
-                <div style="font-size:0.85rem; color:rgba(255,255,255,0.6);">
+                <div style="font-weight:800; font-size:1.08rem; color:#fff; margin-bottom:4px;">${book.title}</div>
+                <div style="font-size:0.85rem; color:rgba(255,255,255,0.65);">
                     <i class="fa-solid fa-feather-pointed" style="color:${style.text};"></i> ${book.author}
                 </div>
-                <div style="margin-top:6px; font-size:0.78rem; background:${style.bg}; color:${style.text}; display:inline-block; padding:3px 10px; border-radius:20px; border:1px solid ${style.border};">${book.genre}</div>
+                <div style="display:flex; gap:8px; align-items:center; margin-top:8px;">
+                    <span style="font-size:0.75rem; background:${style.bg}; color:${style.text}; display:inline-block; padding:3px 10px; border-radius:20px; border:1px solid ${style.border};">${book.genre}</span>
+                    ${book.shelf_location ? `<span style="font-size:0.75rem; color:var(--spatial-gold);"><i class="fa-solid fa-location-dot"></i> ${book.shelf_location}</span>` : ''}
+                </div>
             </div>
         </div>`;
 
@@ -900,7 +1034,7 @@ async function submitBookRequest() {
             throw new Error(err.error || 'Request failed');
         }
         closeBookRequestModal();
-        showToast(`📚 "${bookRequestTarget.title}" requested! Staff will bring it to you shortly.`, 'success');
+        showToast(`📚 "${bookRequestTarget.title}" requested! Staff will bring it to your table shortly.`, 'success');
         document.getElementById('bookReqName').value = '';
         document.getElementById('bookReqTable').value = '';
         document.getElementById('bookReqNote').value = '';
@@ -912,3 +1046,4 @@ async function submitBookRequest() {
 
 // Initialise library when page loads
 document.addEventListener('DOMContentLoaded', fetchLibraryBooks);
+

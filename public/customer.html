@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BrewCafe - Spatial Customer Experience</title>
+    <title>Story With Sip - Spatial Customer Experience</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
     <link rel="icon" type="image/png" href="favicon.png">
@@ -14,6 +14,14 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            if (savedTheme === 'light') {
+                document.documentElement.classList.add('light-theme');
+            }
+        })();
+    </script>
     <style>
         :root {
             --font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -961,6 +969,606 @@
                 opacity: 1;
             }
         }
+
+        /* ======================================================== */
+        /* --- LUXURY LIGHT / WHITE THEME STYLING --- */
+        /* ======================================================== */
+        body.light-theme {
+            --spatial-bg: #f8f6f1;
+            --spatial-glass: rgba(255, 255, 255, 0.88);
+            --spatial-glass-card: rgba(255, 255, 255, 0.84);
+            --spatial-blur: blur(24px) saturate(160%);
+            --spatial-border: rgba(0, 0, 0, 0.08);
+            --spatial-border-highlight: rgba(255, 255, 255, 0.95);
+            --spatial-gold: #b3821a;
+            --spatial-gold-glow: rgba(179, 130, 26, 0.22);
+            --spatial-shadow: 0 16px 45px rgba(60, 45, 20, 0.08);
+            background-color: var(--spatial-bg);
+            color: #1a1a24;
+        }
+
+        /* Ambient Orbs in Light Mode */
+        body.light-theme .spatial-bg-orbs .orb-1 {
+            background: radial-gradient(circle, rgba(226, 183, 68, 0.22) 0%, rgba(212, 175, 55, 0) 70%);
+        }
+        body.light-theme .spatial-bg-orbs .orb-2 {
+            background: radial-gradient(circle, rgba(215, 175, 235, 0.22) 0%, rgba(180, 140, 220, 0) 70%);
+        }
+        body.light-theme .spatial-bg-orbs .orb-3 {
+            background: radial-gradient(circle, rgba(160, 215, 255, 0.22) 0%, rgba(120, 190, 255, 0) 70%);
+        }
+
+        /* Typography & Section Titles */
+        body.light-theme h1,
+        body.light-theme h2,
+        body.light-theme h3,
+        body.light-theme h4,
+        body.light-theme strong {
+            color: #1a1a24;
+        }
+
+        body.light-theme .section-title.gradient-text {
+            background: linear-gradient(135deg, #9c6e0c, #d49b20);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        body.light-theme .section-subtitle {
+            color: #5e5e70 !important;
+        }
+
+        /* Detached Floating Header */
+        body.light-theme .spatial-header {
+            background: var(--spatial-glass);
+            border: 1px solid var(--spatial-border);
+            border-top: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }
+
+        body.light-theme .nav-links a {
+            color: #444455;
+        }
+
+        body.light-theme .nav-links a:hover,
+        body.light-theme .nav-links a.active {
+            color: #111116;
+            background: rgba(0, 0, 0, 0.06);
+            box-shadow: none;
+        }
+
+        body.light-theme .nav-staff-btn {
+            background: rgba(179, 130, 26, 0.12) !important;
+            border-color: rgba(179, 130, 26, 0.35);
+            color: #9c6e0c !important;
+        }
+
+        body.light-theme .nav-staff-btn:hover {
+            background: var(--spatial-gold) !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 20px var(--spatial-gold-glow) !important;
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--spatial-border);
+            color: var(--spatial-gold);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            margin-left: 4px;
+        }
+
+        .theme-toggle-btn:hover {
+            transform: scale(1.1) rotate(15deg);
+            background: rgba(226, 183, 68, 0.22);
+            box-shadow: 0 0 16px var(--spatial-gold-glow);
+            border-color: var(--spatial-gold);
+        }
+
+        body.light-theme .theme-toggle-btn {
+            background: rgba(0, 0, 0, 0.05);
+            border-color: rgba(0, 0, 0, 0.12);
+            color: #9c6e0c;
+        }
+
+        body.light-theme .theme-toggle-btn:hover {
+            background: rgba(179, 130, 26, 0.15);
+            box-shadow: 0 0 16px rgba(179, 130, 26, 0.25);
+            border-color: #9c6e0c;
+        }
+
+        /* Hero Spatial in Light Mode */
+        body.light-theme .hero-spatial {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(248, 243, 233, 0.95) 100%),
+                url('https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 20px 50px rgba(60, 45, 20, 0.07);
+        }
+
+        body.light-theme .hero-spatial h1 {
+            color: #1a1a24;
+            text-shadow: none;
+        }
+
+        body.light-theme .hero-spatial p {
+            color: #555566;
+        }
+
+        body.light-theme .spatial-pill-badge {
+            background: rgba(179, 130, 26, 0.12);
+            border-color: rgba(179, 130, 26, 0.35);
+            color: #9c6e0c;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+        }
+
+        body.light-theme .btn-spatial-secondary {
+            background: rgba(0, 0, 0, 0.05);
+            color: #1a1a24;
+            border: 1px solid rgba(0, 0, 0, 0.12);
+        }
+
+        body.light-theme .btn-spatial-secondary:hover {
+            background: rgba(0, 0, 0, 0.09);
+            border-color: rgba(0, 0, 0, 0.2);
+        }
+
+        body.light-theme .stat-card {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+        }
+
+        body.light-theme .stat-card .val {
+            color: #9c6e0c;
+        }
+
+        body.light-theme .stat-card .lbl {
+            color: #777788;
+        }
+
+        /* About Section */
+        body.light-theme #about .spatial-card {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        body.light-theme #about .spatial-card > div:first-child > div {
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.85) 100%) !important;
+        }
+
+        body.light-theme #about .spatial-card div {
+            color: #4a4a58;
+        }
+
+        /* Menu Section & Cards */
+        body.light-theme .search-box input {
+            background: rgba(255, 255, 255, 0.95);
+            color: #1a1a24;
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+        }
+
+        body.light-theme .search-box input::placeholder {
+            color: #888899;
+        }
+
+        body.light-theme .search-box i.search-icon,
+        body.light-theme .search-box i.clear-icon {
+            color: #777788;
+        }
+
+        body.light-theme .cat-pill {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            color: #444455;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+
+        body.light-theme .cat-pill:hover,
+        body.light-theme .cat-pill.active {
+            background: var(--spatial-gold);
+            color: #ffffff;
+            box-shadow: 0 6px 18px var(--spatial-gold-glow);
+        }
+
+        body.light-theme .spatial-menu-card {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 10px 30px rgba(60, 45, 20, 0.06);
+        }
+
+        body.light-theme .spatial-menu-card:hover {
+            box-shadow: 0 20px 45px rgba(60, 45, 20, 0.12), 0 0 25px var(--spatial-gold-glow);
+            border-color: rgba(179, 130, 26, 0.4);
+        }
+
+        body.light-theme .spatial-menu-card h3 {
+            color: #1a1a24 !important;
+        }
+
+        body.light-theme .spatial-menu-card p.desc {
+            color: #555566 !important;
+        }
+
+        body.light-theme .spatial-menu-card div[style*="font-size: 1.55rem"] {
+            color: #1a1a24 !important;
+        }
+
+        body.light-theme .spatial-menu-card div[style*="border-top"] {
+            border-top: 1px solid rgba(0, 0, 0, 0.07) !important;
+        }
+
+        body.light-theme .menu-img-wrapper > div {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.6) 100%) !important;
+        }
+
+        body.light-theme .menu-img-wrapper span {
+            background: rgba(255, 255, 255, 0.9) !important;
+            border-color: rgba(179, 130, 26, 0.4) !important;
+            color: #9c6e0c !important;
+        }
+
+        /* Cafe Library in Light Mode */
+        body.light-theme #library .spatial-card {
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 8px 25px rgba(60, 45, 20, 0.05);
+        }
+
+        body.light-theme #library .spatial-card div[style*="font-size:0.82rem"] {
+            color: #666677 !important;
+        }
+
+        body.light-theme #libSearchInput {
+            background: rgba(255, 255, 255, 0.95) !important;
+            color: #1a1a24 !important;
+            border: 1px solid rgba(0, 0, 0, 0.12) !important;
+        }
+
+        body.light-theme #libSearchInput::placeholder {
+            color: #888899 !important;
+        }
+
+        body.light-theme #library i.fa-magnifying-glass {
+            color: #777788 !important;
+        }
+
+        body.light-theme #libBookGrid .spatial-card {
+            background: rgba(255, 255, 255, 0.96) !important;
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 10px 30px rgba(60, 45, 20, 0.06) !important;
+        }
+
+        body.light-theme #libBookGrid .spatial-card:hover {
+            box-shadow: 0 20px 45px rgba(60, 45, 20, 0.12), 0 0 20px var(--spatial-gold-glow) !important;
+        }
+
+        body.light-theme #libBookGrid .spatial-card h3 {
+            color: #1a1a24 !important;
+        }
+
+        body.light-theme #libBookGrid .spatial-card p {
+            color: #555566 !important;
+        }
+
+        body.light-theme #libBookGrid .spatial-card div[style*="font-size:0.82rem"] {
+            color: #555566 !important;
+        }
+
+        body.light-theme #libBookGrid .spatial-card div[style*="font-size:0.76rem"] {
+            color: #777788 !important;
+        }
+
+        body.light-theme #libBookGrid .spatial-card div[style*="Perfect Pair:"] {
+            background: rgba(226, 183, 68, 0.12) !important;
+            border-color: rgba(226, 183, 68, 0.35) !important;
+            color: #333344 !important;
+        }
+
+        body.light-theme #libBookGrid .spatial-card div[style*="position: relative"][style*="height: 220px"] {
+            background: radial-gradient(circle at center, rgba(246, 242, 234, 0.95), rgba(235, 229, 218, 0.95)) !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+        }
+
+        /* Live Order Tracker */
+        body.light-theme #tracker .spatial-section-card {
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 15px 40px rgba(60, 45, 20, 0.06);
+        }
+
+        body.light-theme .tracker-input-group input {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            color: #1a1a24;
+        }
+
+        body.light-theme .order-status-card {
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            color: #1a1a24;
+        }
+
+        body.light-theme .order-status-card h3 {
+            color: #1a1a24 !important;
+        }
+
+        body.light-theme .order-status-card span,
+        body.light-theme .order-status-card div {
+            color: #555566;
+        }
+
+        body.light-theme .order-status-card div[style*="border-bottom"] {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+        }
+
+        body.light-theme .status-stepper::before {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .step-icon {
+            background: rgba(0, 0, 0, 0.04);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: #666677;
+        }
+
+        body.light-theme .recent-order-badge {
+            background: rgba(0, 0, 0, 0.04);
+            border-color: rgba(0, 0, 0, 0.1);
+            color: #9c6e0c;
+        }
+
+        body.light-theme .recent-order-badge:hover {
+            background: rgba(179, 130, 26, 0.15);
+        }
+
+        /* Reservations / Table Booking */
+        body.light-theme #reservations .spatial-section-card {
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 15px 40px rgba(60, 45, 20, 0.06);
+        }
+
+        body.light-theme .spatial-table-chip {
+            background: rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        body.light-theme .spatial-table-chip:hover {
+            background: rgba(0, 0, 0, 0.06);
+            border-color: rgba(179, 130, 26, 0.4);
+        }
+
+        body.light-theme .spatial-table-chip.active {
+            background: rgba(179, 130, 26, 0.14);
+            border-color: var(--spatial-gold);
+            box-shadow: 0 0 16px var(--spatial-gold-glow);
+        }
+
+        body.light-theme .spatial-table-chip strong {
+            color: #1a1a24 !important;
+        }
+
+        body.light-theme .spatial-table-chip div {
+            color: #555566;
+        }
+
+        body.light-theme .time-pill {
+            background: rgba(0, 0, 0, 0.04);
+            border-color: rgba(0, 0, 0, 0.1);
+            color: #444455;
+        }
+
+        body.light-theme .time-pill:hover,
+        body.light-theme .time-pill.active {
+            background: var(--spatial-gold);
+            color: #ffffff;
+            box-shadow: 0 0 15px var(--spatial-gold-glow);
+        }
+
+        body.light-theme .modern-input,
+        body.light-theme input.modern-input,
+        body.light-theme select.modern-input,
+        body.light-theme textarea.modern-input {
+            background: rgba(255, 255, 255, 0.95) !important;
+            color: #1a1a24 !important;
+            border: 1px solid rgba(0, 0, 0, 0.12) !important;
+        }
+
+        body.light-theme .modern-input::placeholder {
+            color: #888899 !important;
+        }
+
+        body.light-theme label {
+            color: #444455 !important;
+        }
+
+        body.light-theme .guest-counter {
+            background: rgba(0, 0, 0, 0.03) !important;
+            border: 1px solid rgba(0, 0, 0, 0.1) !important;
+        }
+
+        body.light-theme .guest-counter input {
+            color: #1a1a24 !important;
+        }
+
+        body.light-theme .guest-btn {
+            background: rgba(0, 0, 0, 0.06) !important;
+            color: #1a1a24 !important;
+        }
+
+        /* Feedback Section */
+        body.light-theme #feedback .spatial-section-card {
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 15px 40px rgba(60, 45, 20, 0.06);
+        }
+
+        body.light-theme .emoji-btn {
+            background: rgba(0, 0, 0, 0.03);
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        body.light-theme .emoji-btn:hover {
+            background: rgba(0, 0, 0, 0.06);
+        }
+
+        body.light-theme .emoji-btn.active {
+            background: rgba(179, 130, 26, 0.15);
+            border-color: var(--spatial-gold);
+        }
+
+        body.light-theme .emoji-btn .emoji-label {
+            color: #555566;
+        }
+
+        body.light-theme .emoji-btn.active .emoji-label {
+            color: #9c6e0c;
+        }
+
+        body.light-theme #feedbackWall .spatial-card {
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            color: #333344;
+            box-shadow: 0 10px 25px rgba(60, 45, 20, 0.05);
+        }
+
+        body.light-theme #feedbackWall .spatial-card strong {
+            color: #1a1a24 !important;
+        }
+
+        body.light-theme #feedbackWall .spatial-card p {
+            color: #444455 !important;
+        }
+
+        body.light-theme #feedbackWall .spatial-card span,
+        body.light-theme #feedbackWall .spatial-card div[style*="text-align: right"] {
+            color: #777788 !important;
+        }
+
+        /* Cart Sidebar & Modals */
+        body.light-theme .cart-sidebar {
+            background: rgba(255, 255, 255, 0.98);
+            border-left: 1px solid rgba(0, 0, 0, 0.1);
+            color: #1a1a24;
+            box-shadow: -15px 0 45px rgba(0, 0, 0, 0.15);
+        }
+
+        body.light-theme .cart-header {
+            background: rgba(247, 244, 237, 0.95);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            color: #1a1a24;
+        }
+
+        body.light-theme .cart-header h3 {
+            color: #1a1a24 !important;
+        }
+
+        body.light-theme .cart-header button {
+            color: #1a1a24 !important;
+        }
+
+        body.light-theme .cart-footer {
+            background: rgba(247, 244, 237, 0.95);
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        body.light-theme .cart-item {
+            background: rgba(0, 0, 0, 0.025);
+            border: 1px solid rgba(0, 0, 0, 0.07);
+            color: #1a1a24;
+        }
+
+        body.light-theme .cart-item-title {
+            color: #1a1a24;
+            font-weight: 700;
+        }
+
+        body.light-theme .cart-item-price {
+            color: #9c6e0c;
+        }
+
+        body.light-theme .qty-controls {
+            background: rgba(0, 0, 0, 0.06);
+        }
+
+        body.light-theme .qty-btn {
+            background: none;
+            border: none;
+            color: #1a1a24;
+            cursor: pointer;
+        }
+
+        body.light-theme .modal-card {
+            background: rgba(255, 255, 255, 0.98);
+            color: #1a1a24;
+            border: 1px solid var(--spatial-gold);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15), 0 0 35px var(--spatial-gold-glow);
+        }
+
+        body.light-theme .modal-card h2,
+        body.light-theme .modal-card h3 {
+            color: #1a1a24 !important;
+        }
+
+        body.light-theme .modal-card p {
+            color: #555566 !important;
+        }
+
+        body.light-theme .modal-card button[onclick*="close"] {
+            color: #444455 !important;
+        }
+
+        body.light-theme #orderModal .modal-card div[style*="dashed"] {
+            background: rgba(0, 0, 0, 0.03) !important;
+            border-color: rgba(0, 0, 0, 0.15) !important;
+        }
+
+        body.light-theme #orderModal .modal-card span[style*="color: white"],
+        body.light-theme #orderModal .modal-card strong[style*="color: white"] {
+            color: #1a1a24 !important;
+        }
+
+        body.light-theme #orderModal .modal-card span[style*="rgba(255,255,255,0.6)"] {
+            color: #666677 !important;
+        }
+
+        body.light-theme #bookRequestBookInfo {
+            background: rgba(226, 183, 68, 0.1) !important;
+            border-color: rgba(226, 183, 68, 0.3) !important;
+        }
+
+        body.light-theme #bookRequestBookInfo div[style*="color:#fff"] {
+            color: #1a1a24 !important;
+        }
+
+        body.light-theme #bookRequestBookInfo div[style*="rgba(255,255,255,0.65)"] {
+            color: #555566 !important;
+        }
+
+        body.light-theme .toast {
+            background: rgba(255, 255, 255, 0.97);
+            color: #1a1a24;
+            border: 1px solid var(--spatial-gold);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12), 0 0 20px var(--spatial-gold-glow);
+        }
+
+        body.light-theme .cart-badge {
+            border-color: #f8f6f1;
+        }
+
+        body.light-theme footer div {
+            color: rgba(0, 0, 0, 0.5) !important;
+            border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
+        }
     </style>
 </head>
 
@@ -980,7 +1588,7 @@
         <header class="spatial-header">
             <a href="#" class="logo">
                 <i class="fa-solid fa-mug-hot"></i>
-                <h2 class="gradient-text">BrewCafe</h2>
+                <h2 class="gradient-text">Story With Sip</h2>
             </a>
             <nav class="nav-links">
                 <a href="#about"><i class="fa-solid fa-circle-info"></i> About</a>
@@ -990,6 +1598,10 @@
                 <a href="#reservations"><i class="fa-solid fa-calendar-check"></i> Book Table</a>
                 <a href="#feedback"><i class="fa-solid fa-star"></i> Feedback</a>
                 <a href="/index.html" class="nav-staff-btn"><i class="fa-solid fa-lock"></i> Staff Portal</a>
+                <!-- Luxury Light / Dark Mode Toggle Button -->
+                <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Switch Light / Dark Theme" aria-label="Toggle Theme">
+                    <i class="fa-solid fa-sun" id="themeToggleIcon"></i>
+                </button>
             </nav>
         </header>
     </div>
@@ -1035,7 +1647,7 @@
                 style="padding: 0; overflow: hidden; max-width: 1050px; margin: 0 auto; display: flex; flex-wrap: wrap;">
                 <div style="flex: 1; min-width: 320px; min-height: 340px; position: relative;">
                     <img src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=800&q=80"
-                        alt="BrewCafe Artisan Coffee" style="width: 100%; height: 100%; object-fit: cover;">
+                        alt="Story With Sip Artisan Coffee" style="width: 100%; height: 100%; object-fit: cover;">
                     <div
                         style="position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0,0,0,0.1) 0%, rgba(15,15,24,0.85) 100%);">
                     </div>
@@ -1044,7 +1656,7 @@
                     style="flex: 1.2; min-width: 320px; padding: 45px; display: flex; flex-direction: column; justify-content: center; color: rgba(255,255,255,0.75); line-height: 1.8; font-size: 1.1rem;">
                     <h3 style="color: #fff; font-size: 1.65rem; margin-bottom: 15px; font-weight: 700;">Crafted with
                         Precision & Love</h3>
-                    <p>At BrewCafe, coffee is an artform. We source high-altitude beans directly from sustainable
+                    <p>At Story With Sip, coffee is an artform. We source high-altitude beans directly from sustainable
                         micro-farms across the globe, roasting them in small batches to preserve their nuanced aromas
                         and natural sweetness.</p>
                     <p style="margin-top: 15px;">Whether you're picking up a quick espresso on your morning commute or
@@ -1567,7 +2179,7 @@
     <footer>
         <div class="container"
             style="text-align: center; padding: 40px 0; color: rgba(255,255,255,0.5); border-top: 1px solid rgba(255,255,255,0.06); margin-top: 70px;">
-            <p>&copy; 2026 BrewCafe Spatial Portal. Crafting perfection in virtual space.</p>
+            <p>&copy; 2026 Story With Sip Spatial Portal. Crafting perfection in virtual space.</p>
         </div>
     </footer>
 

@@ -32,7 +32,7 @@ db.serialize(() => {
         db.run("INSERT INTO reservations (table_number, customer_name, guests, reservation_time) VALUES (?, 'Guest ' || ?, 2, datetime('now', '+1 days', 'localtime'))", [i, i]);
     }
 
-    // Insert dummy menu items
+    // Insert dummy menu items if not already present
     const menuItems = [
         { name: 'Vanilla Latte', cat: 'Coffee', price: 250.00 },
         { name: 'Cold Brew', cat: 'Coffee', price: 220.00 },
@@ -41,10 +41,14 @@ db.serialize(() => {
         { name: 'Chocolate Croissant', cat: 'Pastry', price: 180.00 }
     ];
     menuItems.forEach(item => {
-        db.run('INSERT INTO menu_items (name, category, price, is_available) VALUES (?, ?, ?, 1)', [item.name, item.cat, item.price]);
+        db.get('SELECT id FROM menu_items WHERE name = ?', [item.name], (err, row) => {
+            if (!err && !row) {
+                db.run('INSERT INTO menu_items (name, category, price, is_available) VALUES (?, ?, ?, 1)', [item.name, item.cat, item.price]);
+            }
+        });
     });
 
-    // Insert dummy inventory items
+    // Insert dummy inventory items if not already present
     const invItems = [
         { name: 'Espresso Beans', qty: 15.5, unit: 'lbs', thresh: 5.0 },
         { name: 'Whole Milk', qty: 3.0, unit: 'Gallons', thresh: 4.0 }, // Low stock!
@@ -53,7 +57,11 @@ db.serialize(() => {
         { name: 'Pastry Flour', qty: 20.0, unit: 'lbs', thresh: 10.0 }
     ];
     invItems.forEach(item => {
-        db.run('INSERT INTO inventory (item_name, quantity, unit, low_stock_threshold) VALUES (?, ?, ?, ?)', [item.name, item.qty, item.unit, item.thresh]);
+        db.get('SELECT id FROM inventory WHERE item_name = ?', [item.name], (err, row) => {
+            if (!err && !row) {
+                db.run('INSERT INTO inventory (item_name, quantity, unit, low_stock_threshold) VALUES (?, ?, ?, ?)', [item.name, item.qty, item.unit, item.thresh]);
+            }
+        });
     });
 
     console.log('Seeding complete including Menu and Inventory.');

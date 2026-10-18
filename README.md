@@ -1,6 +1,6 @@
-# Cafe Management System
+# Story With Sip - Cafe Management System
 
-A full-stack web application for managing cafe operations, serving both customers and cafe administrators/staff. Built with **Node.js**, **Express.js**, **SQLite**, and **Vanilla HTML/CSS/JS**.
+A full-stack web application for managing cafe operations, serving both customers and cafe administrators/staff for **Story With Sip**. Built with **Node.js**, **Express.js**, **SQLite**, and **Vanilla HTML/CSS/JS**.
 
 ---
 
