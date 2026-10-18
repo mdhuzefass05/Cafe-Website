@@ -9,7 +9,22 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
+// Serve Customer Portal on root '/'
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'customer.html'));
+});
+
+// Friendly aliases
+app.get(['/customer', '/customer.html'], (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'customer.html'));
+});
+
+app.get(['/login', '/staff'], (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Static files (disabled default index so root '/' serves customer portal)
+app.use(express.static(path.join(__dirname, 'public'), { index: false }));
 
 // Session configuration
 app.use(session({
