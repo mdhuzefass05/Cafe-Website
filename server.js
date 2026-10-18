@@ -30,6 +30,7 @@ app.use('/api/feedback', require('./routes/feedback'));
 app.use('/api/dashboard', require('./routes/dashboard'));
 app.use('/api/menu', require('./routes/menu'));
 app.use('/api/inventory', require('./routes/inventory'));
+app.use('/api/library', require('./routes/library'));
 
 // Start server
 app.listen(PORT, () => {

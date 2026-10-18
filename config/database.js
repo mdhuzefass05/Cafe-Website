@@ -108,6 +108,128 @@ function initializeDatabase() {
             )
         `);
 
+        // Books Table (Cafe Library)
+        db.run(`
+            CREATE TABLE IF NOT EXISTS books (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                author TEXT NOT NULL,
+                genre TEXT NOT NULL,
+                cover_image TEXT,
+                shelf_location TEXT NOT NULL,
+                copies_total INTEGER DEFAULT 1,
+                copies_available INTEGER DEFAULT 1,
+                paired_menu_item_id INTEGER,
+                description TEXT,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (paired_menu_item_id) REFERENCES menu_items(id)
+            )
+        `, (err) => {
+            if (!err) {
+                // Seed initial curated books if empty
+                db.get('SELECT COUNT(*) as count FROM books', [], (err, row) => {
+                    if (!err && row && row.count === 0) {
+                        const seedBooks = [
+                            {
+                                title: 'The World Atlas of Coffee',
+                                author: 'James Hoffmann',
+                                genre: 'Coffee Lore',
+                                cover_image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80',
+                                shelf_location: 'Shelf A1 - Brew Bar Nook',
+                                copies_total: 2,
+                                copies_available: 2,
+                                paired_menu_item_id: 1, // Vanilla Latte
+                                description: 'An illustrated tour of the greatest coffee-producing regions on Earth, bean processing methods, and barista secrets from World Barista Champion James Hoffmann.'
+                            },
+                            {
+                                title: 'Kafka on the Shore',
+                                author: 'Haruki Murakami',
+                                genre: 'Fiction',
+                                cover_image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&q=80',
+                                shelf_location: 'Shelf B2 - Fireside Reading Corner',
+                                copies_total: 2,
+                                copies_available: 1,
+                                paired_menu_item_id: 3, // Matcha Green Tea
+                                description: 'A magical realism masterpiece woven with talking cats, raining fish, and deep metaphysical journeys of self-discovery.'
+                            },
+                            {
+                                title: 'Before the Coffee Gets Cold',
+                                author: 'Toshikazu Kawaguchi',
+                                genre: 'Cozy Reads',
+                                cover_image: 'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?auto=format&fit=crop&w=600&q=80',
+                                shelf_location: 'Shelf B1 - Window Bench',
+                                copies_total: 3,
+                                copies_available: 3,
+                                paired_menu_item_id: 2, // Cold Brew
+                                description: 'In a small Tokyo back alley cafe, customers are offered the rare chance to travel back in time, provided they return before their cup of coffee turns cold.'
+                            },
+                            {
+                                title: 'Meditations',
+                                author: 'Marcus Aurelius',
+                                genre: 'Philosophy',
+                                cover_image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=600&q=80',
+                                shelf_location: 'Shelf C1 - Quiet Study Loft',
+                                copies_total: 2,
+                                copies_available: 2,
+                                paired_menu_item_id: 2, // Cold Brew
+                                description: 'Timeless stoic reflections on wisdom, discipline, inner tranquility, and navigating life with clarity and purpose.'
+                            },
+                            {
+                                title: 'Atomic Habits',
+                                author: 'James Clear',
+                                genre: 'Personal Growth',
+                                cover_image: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&w=600&q=80',
+                                shelf_location: 'Shelf C2 - Quiet Study Loft',
+                                copies_total: 3,
+                                copies_available: 2,
+                                paired_menu_item_id: 5, // Chocolate Croissant
+                                description: 'A transformative framework for improving every single day. Practical strategies to build good habits, break bad ones, and master tiny behaviors.'
+                            },
+                            {
+                                title: 'The Design of Everyday Things',
+                                author: 'Don Norman',
+                                genre: 'Art & Design',
+                                cover_image: 'https://images.unsplash.com/photo-1532012164546-f432f2e3777a?auto=format&fit=crop&w=600&q=80',
+                                shelf_location: 'Shelf A2 - Creative Lounge',
+                                copies_total: 2,
+                                copies_available: 2,
+                                paired_menu_item_id: 4, // Blueberry Muffin
+                                description: 'The legendary guide on cognitive design, usability, ergonomics, and how simple objects can either delight or frustrate human beings.'
+                            }
+                        ];
+
+                        const stmt = db.prepare(`
+                            INSERT INTO books (title, author, genre, cover_image, shelf_location, copies_total, copies_available, paired_menu_item_id, description)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        `);
+                        seedBooks.forEach(b => {
+                            stmt.run(b.title, b.author, b.genre, b.cover_image, b.shelf_location, b.copies_total, b.copies_available, b.paired_menu_item_id, b.description);
+                        });
+                        stmt.finalize();
+                        console.log('Seeded initial curated cafe library books.');
+                    }
+                });
+            }
+        });
+
+        // Book Loans & Table Reading Requests
+        db.run(`
+            CREATE TABLE IF NOT EXISTS book_loans (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                book_id INTEGER NOT NULL,
+                customer_name TEXT NOT NULL,
+                customer_phone TEXT,
+                table_number INTEGER,
+                loan_type TEXT CHECK(loan_type IN ('in_cafe', 'take_home')) DEFAULT 'in_cafe',
+                status TEXT CHECK(status IN ('active', 'returned', 'overdue')) DEFAULT 'active',
+                borrowed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                due_date DATETIME,
+                returned_at DATETIME,
+                notes TEXT,
+                FOREIGN KEY (book_id) REFERENCES books(id)
+            )
+        `);
+
         // Insert Default Admin User
         db.get('SELECT * FROM users WHERE email = ?', ['admin@cafe.com'], async (err, row) => {
             if (err) {

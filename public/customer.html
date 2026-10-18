@@ -985,6 +985,7 @@
             <nav class="nav-links">
                 <a href="#about"><i class="fa-solid fa-circle-info"></i> About</a>
                 <a href="#menu"><i class="fa-solid fa-utensils"></i> Menu</a>
+                <a href="#library"><i class="fa-solid fa-book-open"></i> Library</a>
                 <a href="#tracker"><i class="fa-solid fa-route"></i> Track Order</a>
                 <a href="#reservations"><i class="fa-solid fa-calendar-check"></i> Book Table</a>
                 <a href="#feedback"><i class="fa-solid fa-star"></i> Feedback</a>
@@ -1371,6 +1372,102 @@
                     style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:24px;"></div>
             </div>
         </section>
+
+        <!-- ============================================ -->
+        <!-- LIBRARY SECTION                             -->
+        <!-- ============================================ -->
+        <section id="library" style="scroll-margin-top: 120px; margin-bottom: 90px;">
+            <h2 class="section-title gradient-text">Cafe Library</h2>
+            <p class="section-subtitle">Explore our curated collection — borrow a book, request it to your table.</p>
+
+            <!-- Library Stats Bar -->
+            <div style="display:flex; gap:20px; flex-wrap:wrap; justify-content:center; margin-bottom:40px;">
+                <div class="spatial-card" style="padding:22px 32px; flex:1; min-width:180px; max-width:240px; text-align:center;">
+                    <div style="font-size:2rem; font-weight:800; color:var(--spatial-gold);" id="libTotalBooks">—</div>
+                    <div style="font-size:0.82rem; color:rgba(255,255,255,0.6); margin-top:4px;"><i class="fa-solid fa-books"></i> Total Books</div>
+                </div>
+                <div class="spatial-card" style="padding:22px 32px; flex:1; min-width:180px; max-width:240px; text-align:center;">
+                    <div style="font-size:2rem; font-weight:800; color:#2ecc71;" id="libAvailBooks">—</div>
+                    <div style="font-size:0.82rem; color:rgba(255,255,255,0.6); margin-top:4px;"><i class="fa-solid fa-circle-check"></i> Available Now</div>
+                </div>
+                <div class="spatial-card" style="padding:22px 32px; flex:1; min-width:180px; max-width:240px; text-align:center;">
+                    <div style="font-size:2rem; font-weight:800; color:#9b59b6;" id="libGenreCount">—</div>
+                    <div style="font-size:0.82rem; color:rgba(255,255,255,0.6); margin-top:4px;"><i class="fa-solid fa-layer-group"></i> Genres</div>
+                </div>
+            </div>
+
+            <!-- Genre Filter Pills -->
+            <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:32px;" id="libGenrePills">
+                <button class="cat-pill active" data-genre="ALL" onclick="filterLibraryByGenre('ALL', this)">All Books</button>
+            </div>
+
+            <!-- Search -->
+            <div style="max-width:540px; margin:0 auto 36px; position:relative;">
+                <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:18px; top:50%; transform:translateY(-50%); color:rgba(255,255,255,0.4); font-size:1rem;"></i>
+                <input type="text" id="libSearchInput" placeholder="Search by title, author, or genre…"
+                    oninput="filterLibrarySearch(this.value)"
+                    style="width:100%; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:50px; padding:14px 20px 14px 48px; color:#fff; font-size:0.95rem; font-family:inherit; outline:none; transition:border 0.3s;"
+                    onfocus="this.style.borderColor='rgba(226,183,68,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.12)'">
+            </div>
+
+            <!-- Book Grid -->
+            <div id="libBookGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:24px; max-width:1200px; margin:0 auto;">
+                <div style="grid-column:1/-1; text-align:center; padding:60px 0; color:rgba(255,255,255,0.4);">
+                    <i class="fa-solid fa-book-open" style="font-size:2rem; margin-bottom:14px; display:block;"></i>
+                    Loading library catalogue…
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Book Request Modal -->
+    <div class="modal-overlay" id="bookRequestModal" style="display:none;">
+        <div class="modal-card" style="max-width:480px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+                <h3 style="font-size:1.35rem; font-weight:800; margin:0;">
+                    <i class="fa-solid fa-book" style="color:var(--spatial-gold); margin-right:8px;"></i>
+                    Request Book
+                </h3>
+                <button onclick="closeBookRequestModal()" style="background:none; border:none; color:rgba(255,255,255,0.6); cursor:pointer; font-size:1.3rem;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div id="bookRequestBookInfo" style="background:rgba(226,183,68,0.07); border:1px solid rgba(226,183,68,0.2); border-radius:18px; padding:20px; margin-bottom:22px;">
+                <!-- Populated by JS -->
+            </div>
+
+            <div class="form-group" style="margin-bottom:16px;">
+                <label style="font-size:0.88rem; color:rgba(255,255,255,0.7); display:block; margin-bottom:8px;">
+                    <i class="fa-solid fa-user" style="color:var(--spatial-gold);"></i> Your Name <span style="color:#e74c3c;">*</span>
+                </label>
+                <input type="text" id="bookReqName" class="modern-input" placeholder="e.g. Priya Sharma" style="padding:13px 16px;">
+            </div>
+            <div class="form-group" style="margin-bottom:16px;">
+                <label style="font-size:0.88rem; color:rgba(255,255,255,0.7); display:block; margin-bottom:8px;">
+                    <i class="fa-solid fa-chair" style="color:var(--spatial-gold);"></i> Your Table
+                </label>
+                <select id="bookReqTable" class="modern-input" style="padding:13px 16px; -webkit-appearance:none;">
+                    <option value="">— Select table —</option>
+                    <option>Table 01 (Window Seat)</option>
+                    <option>Table 02 (Central Lounge)</option>
+                    <option>Table 03 (Garden Patio)</option>
+                    <option>Table 04 (VIP Booth)</option>
+                    <option>Bar Stool Area</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin-bottom:24px;">
+                <label style="font-size:0.88rem; color:rgba(255,255,255,0.7); display:block; margin-bottom:8px;">
+                    <i class="fa-solid fa-note-sticky" style="color:var(--spatial-gold);"></i> Note (optional)
+                </label>
+                <textarea id="bookReqNote" rows="2" class="modern-input" placeholder="e.g. Bring it before my order arrives…" style="padding:13px 16px;"></textarea>
+            </div>
+
+            <div style="display:flex; gap:12px;">
+                <button class="btn-spatial-primary" style="flex:1; padding:14px; justify-content:center;" onclick="submitBookRequest()">
+                    <i class="fa-solid fa-paper-plane"></i> Send Request
+                </button>
+                <button class="btn-spatial-secondary" style="padding:14px 22px;" onclick="closeBookRequestModal()">Cancel</button>
+            </div>
+        </div>
     </div>
 
     <!-- Floating Spatial Cart Button -->

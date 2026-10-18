@@ -119,6 +119,7 @@ if (document.getElementById('logoutBtn')) {
             if (targetId === 'menu') fetchMenu();
             if (targetId === 'inventory') fetchInventory();
             if (targetId === 'reservations') fetchReservations();
+            if (targetId === 'library') fetchLibraryData();
         });
     });
 
@@ -917,4 +918,421 @@ if (document.getElementById('logoutBtn')) {
             } else { alert("Failed to save reservation details"); }
         } catch (err) { console.error(err); }
     });
+
+    // ==========================================
+    // --- LIBRARY & CIRCULATION LOGIC ---
+    // ==========================================
+    let cachedBooks = [];
+    let cachedLoans = [];
+    let bookSearchTimeout = null;
+
+    async function fetchLibraryData() {
+        await Promise.all([fetchLibraryStats(), fetchBooks(), fetchLoans(), loadMenuPairingOptions()]);
+    }
+
+    async function fetchLibraryStats() {
+        try {
+            const res = await fetch(`${API_BASE}/library/stats`);
+            if (res.ok) {
+                const stats = await res.json();
+                const elTitles = document.getElementById('stat-library-titles');
+                const elCopies = document.getElementById('stat-library-copies');
+                const elLoans = document.getElementById('stat-library-loans');
+                const elAvail = document.getElementById('stat-library-available');
+
+                if (elTitles) elTitles.textContent = stats.totalBooks || 0;
+                if (elCopies) elCopies.textContent = stats.totalCopies || 0;
+                if (elLoans) elLoans.textContent = stats.activeLoans || 0;
+                if (elAvail) elAvail.textContent = stats.availableCopies || 0;
+            }
+        } catch (err) {
+            console.error('Error fetching library stats:', err);
+        }
+    }
+
+    window.debounceFetchBooks = () => {
+        clearTimeout(bookSearchTimeout);
+        bookSearchTimeout = setTimeout(fetchBooks, 300);
+    };
+
+    async function fetchBooks() {
+        const search = document.getElementById('bookSearch')?.value.trim() || '';
+        const genre = document.getElementById('bookGenreFilter')?.value || 'All';
+
+        let url = `${API_BASE}/library/books?`;
+        if (search) url += `search=${encodeURIComponent(search)}&`;
+        if (genre && genre !== 'All') url += `genre=${encodeURIComponent(genre)}&`;
+
+        try {
+            const res = await fetch(url);
+            if (res.ok) {
+                cachedBooks = await res.json();
+                renderBooksTable(cachedBooks);
+                const badge = document.getElementById('catalogCountBadge');
+                if (badge) badge.textContent = cachedBooks.length;
+                populateIssueBookSelect(cachedBooks);
+            }
+        } catch (err) {
+            console.error('Error fetching books:', err);
+        }
+    }
+
+    function renderBooksTable(books) {
+        const tbody = document.getElementById('booksTableBody');
+        if (!tbody) return;
+
+        if (books.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 30px;">No books found in this category.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = books.map(b => {
+            const availRatio = `${b.copies_available} / ${b.copies_total}`;
+            let badgeStyle = 'background: rgba(46, 204, 113, 0.2); color: #2ecc71; border: 1px solid rgba(46, 204, 113, 0.4);';
+            if (b.copies_available === 0) {
+                badgeStyle = 'background: rgba(231, 76, 60, 0.2); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.4);';
+            } else if (b.copies_available < b.copies_total) {
+                badgeStyle = 'background: rgba(243, 156, 18, 0.2); color: #f39c12; border: 1px solid rgba(243, 156, 18, 0.4);';
+            }
+
+            const coverImg = b.cover_image
+                ? `<img src="${b.cover_image}" alt="${escapeHtml(b.title)}" style="width: 38px; height: 52px; object-fit: cover; border-radius: 4px; box-shadow: 0 3px 8px rgba(0,0,0,0.4);" onerror="this.src='favicon.svg'">`
+                : `<div style="width: 38px; height: 52px; background: rgba(255,255,255,0.06); border-radius: 4px; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-book" style="color: var(--gold-primary);"></i></div>`;
+
+            const pairingBadge = b.paired_menu_item_name
+                ? `<span style="font-size: 0.82rem; display: inline-flex; align-items: center; gap: 5px; color: var(--gold-primary); background: rgba(212, 175, 55, 0.1); padding: 3px 8px; border-radius: 12px; border: 1px solid rgba(212, 175, 55, 0.25);"><i class="fa-solid fa-mug-hot"></i> ${escapeHtml(b.paired_menu_item_name)}</span>`
+                : `<span style="color: var(--text-secondary); font-size: 0.8rem;">—</span>`;
+
+            return `
+                <tr>
+                    <td>${coverImg}</td>
+                    <td>
+                        <strong style="color: var(--text-primary); font-size: 0.95rem;">${escapeHtml(b.title)}</strong><br>
+                        <span style="color: var(--text-secondary); font-size: 0.82rem;">by ${escapeHtml(b.author)}</span>
+                    </td>
+                    <td><span style="font-size: 0.85rem; background: rgba(255,255,255,0.08); padding: 3px 8px; border-radius: 10px;">${escapeHtml(b.genre)}</span></td>
+                    <td><span style="font-size: 0.85rem; color: var(--text-secondary);"><i class="fa-solid fa-location-dot" style="color: var(--gold-primary); margin-right: 4px;"></i>${escapeHtml(b.shelf_location)}</span></td>
+                    <td>
+                        <span style="display: inline-block; padding: 4px 10px; border-radius: 12px; font-weight: 600; font-size: 0.8rem; ${badgeStyle}">
+                            ${availRatio} Available
+                        </span>
+                    </td>
+                    <td>${pairingBadge}</td>
+                    <td>
+                        <div style="display: flex; gap: 8px;">
+                            ${b.copies_available > 0 ? `<button class="icon-btn" title="Check Out / Issue to Table" onclick="quickIssueBook(${b.id})"><i class="fa-solid fa-hand-holding-hand" style="color: var(--gold-primary);"></i></button>` : ''}
+                            <button class="icon-btn" title="Edit Book" onclick="editBook(${b.id})"><i class="fa-solid fa-pen"></i></button>
+                            <button class="icon-btn" title="Delete Book" onclick="deleteBook(${b.id}, '${escapeJsString(b.title)}')"><i class="fa-solid fa-trash" style="color: var(--danger);"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    async function fetchLoans() {
+        try {
+            const res = await fetch(`${API_BASE}/library/loans`);
+            if (res.ok) {
+                cachedLoans = await res.json();
+                renderLoansTable(cachedLoans);
+                const badge = document.getElementById('loansCountBadge');
+                const activeLoansCount = cachedLoans.filter(l => l.status === 'active').length;
+                if (badge) badge.textContent = activeLoansCount;
+            }
+        } catch (err) {
+            console.error('Error fetching loans:', err);
+        }
+    }
+
+    function renderLoansTable(loans) {
+        const tbody = document.getElementById('loansTableBody');
+        if (!tbody) return;
+
+        if (loans.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 30px;">No circulation or active reading records found.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = loans.map(l => {
+            const isReturned = l.status === 'returned';
+            const statusBadge = isReturned
+                ? `<span style="background: rgba(255,255,255,0.08); color: var(--text-secondary); padding: 4px 10px; border-radius: 12px; font-size: 0.8rem;">Returned</span>`
+                : `<span style="background: rgba(46, 204, 113, 0.2); color: #2ecc71; border: 1px solid rgba(46, 204, 113, 0.4); padding: 4px 10px; border-radius: 12px; font-weight: 600; font-size: 0.8rem;">Active Reading</span>`;
+
+            const typeLabel = l.loan_type === 'in_cafe'
+                ? `<span style="color: var(--gold-primary); font-size: 0.85rem;"><i class="fa-solid fa-mug-hot"></i> Table Reading</span>`
+                : `<span style="color: #3498db; font-size: 0.85rem;"><i class="fa-solid fa-house"></i> Take-Home</span>`;
+
+            const borrowerDisplay = l.table_number
+                ? `<strong>${escapeHtml(l.customer_name)}</strong> <span style="font-size: 0.8rem; color: var(--gold-primary);">(Table ${l.table_number})</span>`
+                : `<strong>${escapeHtml(l.customer_name)}</strong>`;
+
+            const dateStr = l.borrowed_at ? new Date(l.borrowed_at).toLocaleString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
+
+            return `
+                <tr>
+                    <td>#LN-${l.id}</td>
+                    <td>
+                        <strong style="color: var(--text-primary); font-size: 0.95rem;">${escapeHtml(l.book_title)}</strong><br>
+                        <span style="color: var(--text-secondary); font-size: 0.82rem;">${escapeHtml(l.book_shelf_location || '')}</span>
+                    </td>
+                    <td>${borrowerDisplay}</td>
+                    <td>${typeLabel}</td>
+                    <td>${dateStr}</td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        ${!isReturned ? `
+                            <button class="btn-primary" style="padding: 5px 12px; font-size: 0.82rem;" onclick="returnBook(${l.id})">
+                                <i class="fa-solid fa-arrow-rotate-left"></i> Return to Shelf
+                            </button>
+                        ` : `<span style="color: var(--text-secondary); font-size: 0.82rem;">Completed</span>`}
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    window.switchLibrarySubTab = (tab) => {
+        const catBtn = document.getElementById('tabBtnCatalog');
+        const loansBtn = document.getElementById('tabBtnLoans');
+        const subCat = document.getElementById('subtab-catalog');
+        const subLoans = document.getElementById('subtab-loans');
+        const toolbar = document.getElementById('catalogToolbar');
+
+        if (tab === 'catalog') {
+            catBtn.className = 'btn-primary';
+            loansBtn.className = 'btn-secondary';
+            subCat.style.display = 'block';
+            subLoans.style.display = 'none';
+            if (toolbar) toolbar.style.display = 'flex';
+        } else {
+            catBtn.className = 'btn-secondary';
+            loansBtn.className = 'btn-primary';
+            subCat.style.display = 'none';
+            subLoans.style.display = 'block';
+            if (toolbar) toolbar.style.display = 'none';
+        }
+    };
+
+    async function loadMenuPairingOptions() {
+        try {
+            const res = await fetch(`${API_BASE}/menu`);
+            if (res.ok) {
+                const items = await res.json();
+                const sel = document.getElementById('bookPairedMenu');
+                if (!sel) return;
+                sel.innerHTML = '<option value="">-- No Specific Pairing --</option>' +
+                    items.map(m => `<option value="${m.id}">${escapeHtml(m.name)} (₹${m.price})</option>`).join('');
+            }
+        } catch (err) {
+            console.error('Error loading menu options:', err);
+        }
+    }
+
+    function populateIssueBookSelect(books) {
+        const sel = document.getElementById('issueBookSelect');
+        if (!sel) return;
+        const available = books.filter(b => b.copies_available > 0);
+        sel.innerHTML = available.map(b => `<option value="${b.id}">${escapeHtml(b.title)} (${b.copies_available} available - ${b.shelf_location})</option>`).join('');
+    }
+
+    window.updateBookCoverPreview = () => {
+        const url = document.getElementById('bookCover')?.value.trim();
+        const container = document.getElementById('bookCoverPreviewContainer');
+        const img = document.getElementById('bookCoverPreviewImg');
+        if (url && container && img) {
+            img.src = url;
+            container.style.display = 'flex';
+        } else if (container) {
+            container.style.display = 'none';
+        }
+    };
+
+    window.showCreateBookModal = () => {
+        document.getElementById('bookForm').reset();
+        document.getElementById('bookId').value = '';
+        document.getElementById('bookFormTitle').innerHTML = '<i class="fa-solid fa-book"></i> Add Library Book';
+        document.getElementById('saveBookBtn').textContent = 'Save Book to Library';
+        document.getElementById('bookCopies').value = 1;
+        document.getElementById('bookCoverPreviewContainer').style.display = 'none';
+        loadMenuPairingOptions();
+        document.getElementById('bookFormModal').classList.add('active');
+    };
+
+    window.closeBookFormModal = () => {
+        document.getElementById('bookFormModal').classList.remove('active');
+    };
+
+    window.editBook = (id) => {
+        const book = cachedBooks.find(b => b.id === id);
+        if (!book) return;
+
+        loadMenuPairingOptions().then(() => {
+            document.getElementById('bookId').value = book.id;
+            document.getElementById('bookTitle').value = book.title;
+            document.getElementById('bookAuthor').value = book.author;
+            document.getElementById('bookGenre').value = book.genre;
+            document.getElementById('bookShelf').value = book.shelf_location;
+            document.getElementById('bookCopies').value = book.copies_total;
+            document.getElementById('bookPairedMenu').value = book.paired_menu_item_id || '';
+            document.getElementById('bookCover').value = book.cover_image || '';
+            document.getElementById('bookDescription').value = book.description || '';
+
+            updateBookCoverPreview();
+
+            document.getElementById('bookFormTitle').innerHTML = '<i class="fa-solid fa-pen"></i> Edit Library Book';
+            document.getElementById('saveBookBtn').textContent = 'Update Book Details';
+            document.getElementById('bookFormModal').classList.add('active');
+        });
+    };
+
+    document.getElementById('bookForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('bookId').value;
+        const payload = {
+            title: document.getElementById('bookTitle').value.trim(),
+            author: document.getElementById('bookAuthor').value.trim(),
+            genre: document.getElementById('bookGenre').value,
+            shelf_location: document.getElementById('bookShelf').value.trim(),
+            copies_total: parseInt(document.getElementById('bookCopies').value, 10) || 1,
+            paired_menu_item_id: parseInt(document.getElementById('bookPairedMenu').value, 10) || null,
+            cover_image: document.getElementById('bookCover').value.trim(),
+            description: document.getElementById('bookDescription').value.trim()
+        };
+
+        try {
+            const url = id ? `${API_BASE}/library/books/${id}` : `${API_BASE}/library/books`;
+            const method = id ? 'PUT' : 'POST';
+
+            const res = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                closeBookFormModal();
+                fetchLibraryData();
+            } else {
+                const errData = await res.json();
+                alert(errData.error || 'Failed to save book.');
+            }
+        } catch (err) {
+            console.error('Error saving book:', err);
+            alert('Server error saving book.');
+        }
+    });
+
+    window.deleteBook = async (id, title) => {
+        if (!confirm(`Are you sure you want to remove "${title}" from the library?`)) return;
+
+        try {
+            const res = await fetch(`${API_BASE}/library/books/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                fetchLibraryData();
+            } else {
+                const data = await res.json();
+                alert(data.error || 'Failed to delete book.');
+            }
+        } catch (err) {
+            console.error('Error deleting book:', err);
+        }
+    };
+
+    window.showIssueBookModal = (preselectedBookId = null) => {
+        document.getElementById('issueBookForm').reset();
+        populateIssueBookSelect(cachedBooks);
+        if (preselectedBookId) {
+            document.getElementById('issueBookSelect').value = preselectedBookId;
+        }
+        toggleIssueDueDate();
+        document.getElementById('issueBookModal').classList.add('active');
+    };
+
+    window.quickIssueBook = (bookId) => {
+        showIssueBookModal(bookId);
+    };
+
+    window.closeIssueBookModal = () => {
+        document.getElementById('issueBookModal').classList.remove('active');
+    };
+
+    window.toggleIssueDueDate = () => {
+        const type = document.getElementById('issueLoanType').value;
+        const dueGroup = document.getElementById('issueDueDateGroup');
+        if (type === 'take_home') {
+            dueGroup.style.display = 'block';
+            const sevenDaysLater = new Date();
+            sevenDaysLater.setDate(sevenDaysLater.getDate() + 7);
+            document.getElementById('issueDueDate').value = sevenDaysLater.toISOString().split('T')[0];
+        } else {
+            dueGroup.style.display = 'none';
+        }
+    };
+
+    document.getElementById('issueBookForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const payload = {
+            book_id: parseInt(document.getElementById('issueBookSelect').value, 10),
+            customer_name: document.getElementById('issueCustomerName').value.trim(),
+            table_number: parseInt(document.getElementById('issueTableNumber').value, 10) || null,
+            customer_phone: document.getElementById('issueCustomerPhone').value.trim(),
+            loan_type: document.getElementById('issueLoanType').value,
+            due_date: document.getElementById('issueDueDate').value || null,
+            notes: document.getElementById('issueNotes').value.trim()
+        };
+
+        try {
+            const res = await fetch(`${API_BASE}/library/loans`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                closeIssueBookModal();
+                fetchLibraryData();
+            } else {
+                const errData = await res.json();
+                alert(errData.error || 'Failed to issue book.');
+            }
+        } catch (err) {
+            console.error('Error issuing book:', err);
+            alert('Server error creating loan.');
+        }
+    });
+
+    window.returnBook = async (loanId) => {
+        try {
+            const res = await fetch(`${API_BASE}/library/loans/${loanId}/return`, {
+                method: 'PUT'
+            });
+            if (res.ok) {
+                fetchLibraryData();
+            } else {
+                const errData = await res.json();
+                alert(errData.error || 'Failed to return book.');
+            }
+        } catch (err) {
+            console.error('Error returning book:', err);
+        }
+    };
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>"']/g, m => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        })[m]);
+    }
+
+    function escapeJsString(str) {
+        if (!str) return '';
+        return String(str).replace(/'/g, "\\'").replace(/"/g, '\\"');
+    }
 }
+
